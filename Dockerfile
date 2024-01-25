@@ -1,4 +1,23 @@
-FROM scratch
-RUN cd server && npm install
-RUN cd client && npm install
-CMD node ./server/index.js & cd/client; npm start
+# Use Node.js LTS version
+FROM node:16-alpine
+
+# Create app directory
+WORKDIR /app
+
+# Install client and server dependencies
+COPY package*.json ./
+RUN npm install --only=production
+RUN npm install -g nodemon
+
+# Bundle client dependencies
+COPY . .
+RUN npm run build
+
+# Define environment variables
+ENV NODE_ENV=production
+
+# Expose server port
+EXPOSE 8000
+
+# Start server and client
+CMD [ "nodemon", "index.js" ] && [ "npm", "start" ]
