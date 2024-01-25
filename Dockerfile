@@ -2,7 +2,7 @@
 FROM node:16-alpine
 
 # Create app directory
-WORKDIR /client
+WORKDIR client
 
 # Install client and server dependencies
 COPY package*.json ./
