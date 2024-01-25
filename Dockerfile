@@ -6,8 +6,7 @@ WORKDIR client
 
 # Install client and server dependencies
 COPY package*.json ./
-RUN npm install --only=production
-RUN npm install -g nodemon
+RUN npm install 
 
 # Bundle client dependencies
 COPY . .
@@ -18,8 +17,7 @@ WORKDIR /server
 
 # Install client and server dependencies
 COPY package*.json ./
-RUN npm install --only=production
-RUN npm install -g nodemon
+RUN npm install
 
 # Bundle client dependencies
 COPY . .
