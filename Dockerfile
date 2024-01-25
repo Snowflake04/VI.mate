@@ -1,11 +1,15 @@
 # Use Node.js LTS version
-FROM node:16-alpine
+FROM node:21
 
 # Create app directory
 WORKDIR client
 
+
+
+
 # Install client and server dependencies
 COPY package*.json ./
+RUN npm cache clean --force
 RUN npm install 
 
 # Bundle client dependencies
@@ -17,6 +21,7 @@ WORKDIR /server
 
 # Install client and server dependencies
 COPY package*.json ./
+RUN npm cache clean --force
 RUN npm install
 
 # Bundle client dependencies
