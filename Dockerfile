@@ -1,5 +1,6 @@
 # Use Node.js LTS version
 FROM node:21
+RUN npm install -g npm@latest
 
 # Create app directory
 WORKDIR client
