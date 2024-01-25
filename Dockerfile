@@ -2,7 +2,19 @@
 FROM node:16-alpine
 
 # Create app directory
-WORKDIR /app
+WORKDIR /client
+
+# Install client and server dependencies
+COPY package*.json ./
+RUN npm install --only=production
+RUN npm install -g nodemon
+
+# Bundle client dependencies
+COPY . .
+RUN npm run build
+
+
+WORKDIR /server
 
 # Install client and server dependencies
 COPY package*.json ./
