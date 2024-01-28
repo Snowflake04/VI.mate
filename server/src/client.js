@@ -5,10 +5,14 @@ const { join, resolve } = require('path');
 class Client extends Server {
   constructor(...server) {
     super(...server);
+    this.on('connection', (socket) => {
+      this.registerSocketEvents(socket);
+      console.log('connected socket' + socket.id);
+    });
   }
 
   registerSocketEvents(socket) {
-    const path = './src/events'
+    const path = './src/events';
     readdir(path, (err, files) => {
       if (err) console.warn(err);
 
@@ -20,11 +24,14 @@ class Client extends Server {
       files.forEach((f) => {
         const eventName = f.substring(0, f.indexOf('.'));
         const event = require(resolve(__basedir, join(path, f)));
-        socket.on(eventName, event.bind(null, {server:this, socket:socket}));
+        socket.on(
+          eventName,
+          event.bind(null, { server: this, socket: socket })
+        );
         // Clear cache
         delete require.cache[
           require.resolve(resolve(__basedir, join(path, f)))
-        ]; 
+        ];
         console.log(`Loading event: ${eventName}`);
       });
     });
