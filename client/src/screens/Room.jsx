@@ -21,7 +21,7 @@ const RoomPage = () => {
     });
     const offer = await peer.getOffer();
     console.log(stream)
-    socket.emit("user:call", { to: remoteSocketId, offer });
+    socket.emit("userCall", { to: remoteSocketId, offer });
     setMyStream(stream);
   }, [remoteSocketId, socket]);
 
@@ -35,7 +35,7 @@ const RoomPage = () => {
       setMyStream(stream);
       console.log(`Incoming Call`, from, offer);
       const ans = await peer.getAnswer(offer);
-      socket.emit("call:accepted", { to: from, ans });
+      socket.emit("callAccepted", { to: from, ans });
     },
     [socket]
   );
@@ -57,7 +57,7 @@ const RoomPage = () => {
 
   const handleNegoNeeded = useCallback(async () => {
     const offer = await peer.getOffer();
-    socket.emit("peer:nego:needed", { offer, to: remoteSocketId });
+    socket.emit("peerNegoNeeded", { offer, to: remoteSocketId });
   }, [remoteSocketId, socket]);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const RoomPage = () => {
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }) => {
       const ans = await peer.getAnswer(offer);
-      socket.emit("peer:nego:done", { to: from, ans });
+      socket.emit("peerNegoDone", { to: from, ans });
     },
     [socket]
   );
@@ -88,18 +88,18 @@ const RoomPage = () => {
   }, []);
 
   useEffect(() => {
-    socket.on("user:joined", handleUserJoined);
-    socket.on("incomming:call", handleIncommingCall);
-    socket.on("call:accepted", handleCallAccepted);
-    socket.on("peer:nego:needed", handleNegoNeedIncomming);
-    socket.on("peer:nego:final", handleNegoNeedFinal);
+    socket.on("userJoined", handleUserJoined);
+    socket.on("incommingCall", handleIncommingCall);
+    socket.on("callAccepted", handleCallAccepted);
+    socket.on("peerNegoNeeded", handleNegoNeedIncomming);
+    socket.on("peerNegoFinal", handleNegoNeedFinal);
 
     return () => {
-      socket.off("user:joined", handleUserJoined);
-      socket.off("incomming:call", handleIncommingCall);
-      socket.off("call:accepted", handleCallAccepted);
-      socket.off("peer:nego:needed", handleNegoNeedIncomming);
-      socket.off("peer:nego:final", handleNegoNeedFinal);
+      socket.off("userJoined", handleUserJoined);
+      socket.off("incommingCall", handleIncommingCall);
+      socket.off("callAccepted", handleCallAccepted);
+      socket.off("peerNegoNeeded", handleNegoNeedIncomming);
+      socket.off("peerNegoFinal", handleNegoNeedFinal);
     };
   }, [
     socket,

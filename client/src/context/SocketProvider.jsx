@@ -8,12 +8,12 @@ export const useSocket = () => {
   return socket;
 };
 
-export const SocketProvider = (props) => {
-  const socket = useMemo(() => io('https://server-ipb4.onrender.com'), []);
+export const SocketProvider = ({children}) => {
+  const socket = useMemo(() => io('http://localhost:8000'), []);
 
   return (
     <SocketContext.Provider value={socket}>
-      {props.children}
+      {children}
     </SocketContext.Provider>
   );
 };
