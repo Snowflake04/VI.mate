@@ -9,7 +9,7 @@ export const useSocket = () => {
 };
 
 export const SocketProvider = ({children}) => {
-  const socket = useMemo(() => io('http://localhost:8000'), []);
+  const socket = useMemo(() => io('https://server-ipb4.onrender.com'), []);
 
   return (
     <SocketContext.Provider value={socket}>
