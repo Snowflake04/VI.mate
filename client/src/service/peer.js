@@ -36,6 +36,8 @@ class PeerService {
       return offer;
     }
   }
+
+  generateRoomId
 }
 
 export default new PeerService();
