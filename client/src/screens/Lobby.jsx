@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSocket } from '../context/SocketProvider';
+import { useSocket, getPeer } from '../context/SocketProvider';
 import dotSquare from '../images/squaredot.png';
 import { TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -18,6 +18,9 @@ const LobbyScreen = () => {
   });
   const socket = useSocket();
   const navigate = useNavigate();
+  const peer = getPeer();
+  peer.socket = socket;
+  peer.localPeerId = socket.id
 
   const validateUsername = () => {
     if (username === '') {
@@ -48,16 +51,30 @@ const LobbyScreen = () => {
       socket.emit('joinRoom', username, roomCode);
     }
   };
-  const JoinNewRoom = useCallback((roomCode) => {
-    navigate(`/room/${roomCode}`);
-  });
+
+  const joinNewRoom = async (room) => {
+    peer.roomId = room
+    await peer.setLocalStream()
+    navigate(`/room/${room}`);
+  };
+
+  const joinRoom = async (room) => {
+    peer.roomId = room
+   await peer.setLocalStream()
+    navigate(`/room/${room}`);
+    socket.emit("createCall", ({
+      roomId: peer.roomId,
+      from: peer.localPeerId
+    }))
+    
+  };
 
   useEffect(() => {
-    socket.on('newRoomCreated', JoinNewRoom);
-    socket.on('roomJoined', JoinNewRoom)
+    socket.on('newRoomCreated', joinNewRoom);
+    socket.on('roomJoined', joinRoom);
     return () => {
-      socket.off('newRoomCreated', JoinNewRoom);
-      socket.off("roomJoined", JoinNewRoom)
+      socket.off('newRoomCreated', joinNewRoom);
+      socket.off('roomJoined', joinRoom);
     };
   }, [socket]);
 

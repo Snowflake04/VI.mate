@@ -1,129 +1,270 @@
-import React, { useEffect, useCallback, useState } from "react";
-import ReactPlayer from "react-player";
-import peer from "../service/peer";
-import { useSocket } from "../context/SocketProvider";
+import React, { useEffect, useCallback, useState } from 'react';
+import ReactPlayer from 'react-player';
+import { useSocket, getPeer } from '../context/SocketProvider';
 
 const RoomPage = () => {
   const socket = useSocket();
   const [remoteSocketId, setRemoteSocketId] = useState(null);
   const [myStream, setMyStream] = useState();
-  const [remoteStream, setRemoteStream] = useState();
+  const [remoteStream, setNewRemoteStream] = useState();
+  const Peer = getPeer();
+  
 
-  const handleUserJoined = useCallback(({ email, id }) => {
-    console.log(`Email ${email} joined room`);
-    setRemoteSocketId(id);
-  }, []);
 
-  const handleCallUser = useCallback(async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
+  useEffect(() => {
+    socket.on('newUserJoined', (username, id )=>{ //TODO: create a splash for displaying  new user joined message
+      console.log("New user joined")
     });
-    const offer = await peer.getOffer();
-    console.log(stream)
-    socket.emit("userCall", { to: remoteSocketId, offer });
-    setMyStream(stream);
-  }, [remoteSocketId, socket]);
+    socket.on("incommingCall", handleCall)
+    socket.on("RTCOffer", handleOffer)
+    socket.on('RTCAnswer', handleAnswer)
+    socket.on('iceCandidate', Peer.handleIceCandidate)
+  },[]);
 
-  const handleIncommingCall = useCallback(
-    async ({ from, offer }) => {
-      setRemoteSocketId(from);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-      setMyStream(stream);
-      console.log(`Incoming Call`, from, offer);
-      const ans = await peer.getAnswer(offer);
-      socket.emit("callAccepted", { to: from, ans });
-    },
-    [socket]
-  );
 
-  const sendStreams = useCallback(() => {
-    for (const track of myStream.getTracks()) {
-      peer.peer.addTrack(track, myStream);
-    }
-  }, [myStream]);
 
-  const handleCallAccepted = useCallback(
-    ({ from, ans }) => {
-      peer.setLocalDescription(ans);
-      console.log("Call Accepted!");
-      sendStreams();
-    },
-    [sendStreams]
-  );
+const handleCall = async(offer)=>{
+  console.log("got call")
+  await Peer.handleIncommingCall(offer)
+}
 
-  const handleNegoNeeded = useCallback(async () => {
-    const offer = await peer.getOffer();
-    socket.emit("peerNegoNeeded", { offer, to: remoteSocketId });
-  }, [remoteSocketId, socket]);
+const handleOffer = (offer)=>{
+  Peer.handleRTCOffer(offer)
+}
+const handleAnswer = async(offer) =>{
+  await Peer.handleRTCAnswer(offer)
+}
 
-  useEffect(() => {
-    peer.peer.addEventListener("negotiationneeded", handleNegoNeeded);
-    return () => {
-      peer.peer.removeEventListener("negotiationneeded", handleNegoNeeded);
-    };
-  }, [handleNegoNeeded]);
 
-  const handleNegoNeedIncomming = useCallback(
-    async ({ from, offer }) => {
-      const ans = await peer.getAnswer(offer);
-      socket.emit("peerNegoDone", { to: from, ans });
-    },
-    [socket]
-  );
+  // BUTTON LISTENER ============================================================
+  // connectButton.addEventListener('click', () => {
+  //   joinRoom(roomInput.value);
+  // });
 
-  const handleNegoNeedFinal = useCallback(async ({ ans }) => {
-    await peer.setLocalDescription(ans);
-  }, []);
+  // // SOCKET EVENT CALLBACKS =====================================================
+  // socket.on('roomCreated', async (event) => {
+  //   localPeerId = event.peerId;
+  //   console.log(`Current peer ID: ${localPeerId}`);
+  //   console.log(
+  //     `Socket event callback: room_created with by peer ${localPeerId}, created room ${event.roomId}`
+  //   );
 
-  useEffect(() => {
-    peer.peer.addEventListener("track", async (ev) => {
-      const remoteStream = ev.streams;
-      console.log("GOT TRACKS!!");
-      setRemoteStream(remoteStream[0]);
-    });
-  }, []);
+  //   await setLocalStream(mediaConstraints);
+  // });
 
-  useEffect(() => {
-    socket.on("userJoined", handleUserJoined);
-    socket.on("incommingCall", handleIncommingCall);
-    socket.on("callAccepted", handleCallAccepted);
-    socket.on("peerNegoNeeded", handleNegoNeedIncomming);
-    socket.on("peerNegoFinal", handleNegoNeedFinal);
+  // socket.on('room_joined', async (event) => {
+  //   localPeerId = event.peerId;
+  //   console.log(`Current peer ID: ${localPeerId}`);
+  //   console.log(
+  //     `Socket event callback: room_joined by peer ${localPeerId}, joined room ${event.roomId}`
+  //   );
 
-    return () => {
-      socket.off("userJoined", handleUserJoined);
-      socket.off("incommingCall", handleIncommingCall);
-      socket.off("callAccepted", handleCallAccepted);
-      socket.off("peerNegoNeeded", handleNegoNeedIncomming);
-      socket.off("peerNegoFinal", handleNegoNeedFinal);
-    };
-  }, [
-    socket,
-    handleUserJoined,
-    handleIncommingCall,
-    handleCallAccepted,
-    handleNegoNeedIncomming,
-    handleNegoNeedFinal,
-  ]);
+  //   await setLocalStream(mediaConstraints);
+  //   console.log(`Emit start_call from peer ${localPeerId}`);
+  //   socket.emit('start_call', {
+  //     roomId: event.roomId,
+  //     senderId: localPeerId,
+  //   });
+  // });
+
+  // socket.on('start_call', async (event) => {
+  //   const remotePeerId = event.senderId;
+  //   console.log(
+  //     `Socket event callback: start_call. RECEIVED from ${remotePeerId}`
+  //   );
+
+  //   peerConnections[remotePeerId] = new RTCPeerConnection(iceServers);
+  //   addLocalTracks(peerConnections[remotePeerId]);
+  //   peerConnections[remotePeerId].ontrack = (event) =>
+  //     setRemoteStream(event, remotePeerId);
+  //   peerConnections[remotePeerId].oniceconnectionstatechange = (event) =>
+  //     checkPeerDisconnect(event, remotePeerId);
+  //   peerConnections[remotePeerId].onicecandidate = (event) =>
+  //     sendIceCandidate(event, remotePeerId);
+  //   await createOffer(peerConnections[remotePeerId], remotePeerId);
+  // });
+
+  // socket.on('webrtc_offer', async (event) => {
+  //   console.log(
+  //     `Socket event callback: webrtc_offer. RECEIVED from ${event.senderId}`
+  //   );
+  //   const remotePeerId = event.senderId;
+
+  //   peerConnections[remotePeerId] = new RTCPeerConnection(iceServers);
+  //   console.log(new RTCSessionDescription(event.sdp));
+  //   peerConnections[remotePeerId].setRemoteDescription(
+  //     new RTCSessionDescription(event.sdp)
+  //   );
+  //   console.log(
+  //     `Remote description set on peer ${localPeerId} after offer received`
+  //   );
+  //   addLocalTracks(peerConnections[remotePeerId]);
+
+  //   peerConnections[remotePeerId].ontrack = (event) =>
+  //     setRemoteStream(event, remotePeerId);
+  //   peerConnections[remotePeerId].oniceconnectionstatechange = (event) =>
+  //     checkPeerDisconnect(event, remotePeerId);
+  //   peerConnections[remotePeerId].onicecandidate = (event) =>
+  //     sendIceCandidate(event, remotePeerId);
+  //   await createAnswer(peerConnections[remotePeerId], remotePeerId);
+  // });
+
+  // socket.on('webrtc_answer', async (event) => {
+  //   console.log(
+  //     `Socket event callback: webrtc_answer. RECEIVED from ${event.senderId}`
+  //   );
+
+  //   console.log(
+  //     `Remote description set on peer ${localPeerId} after answer received`
+  //   );
+  //   peerConnections[event.senderId].setRemoteDescription(
+  //     new RTCSessionDescription(event.sdp)
+  //   );
+  //   //addLocalTracks(peerConnections[event.senderId])
+  //   console.log(new RTCSessionDescription(event.sdp));
+  // });
+
+  // socket.on('webrtc_ice_candidate', (event) => {
+  //   const senderPeerId = event.senderId;
+  //   console.log(
+  //     `Socket event callback: webrtc_ice_candidate. RECEIVED from ${senderPeerId}`
+  //   );
+
+  //   // ICE candidate configuration.
+  //   var candidate = new RTCIceCandidate({
+  //     sdpMLineIndex: event.label,
+  //     candidate: event.candidate,
+  //   });
+  //   peerConnections[senderPeerId].addIceCandidate(candidate);
+  // });
+
+  // // FUNCTIONS ==================================================================
+
+  // function joinRoom(room) {
+  //   if (room === '') {
+  //     alert('Please type a room ID');
+  //   } else {
+  //     roomId = room;
+  //     socket.emit('join', { room: room, peerUUID: localPeerId });
+  //   }
+  // }
+
+  // async function setLocalStream(mediaConstraints) {
+  //   console.log('Local stream set');
+  //   let stream;
+  //   try {
+  //     stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+  //   } catch (error) {
+  //     console.error('Could not get user media', error);
+  //   }
+
+  //   localStream = stream;
+  //   // localVideoComponent.srcObject = stream;
+  // }
+
+  // function addLocalTracks(rtcPeerConnection) {
+  //   localStream.getTracks().forEach((track) => {
+  //     rtcPeerConnection.addTrack(track, localStream);
+  //   });
+  //   console.log('Local tracks added');
+  // }
+
+  // async function createOffer(rtcPeerConnection, remotePeerId) {
+  //   let sessionDescription;
+  //   try {
+  //     sessionDescription = await rtcPeerConnection.createOffer(offerOptions);
+  //     rtcPeerConnection.setLocalDescription(sessionDescription);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+
+  //   console.log(
+  //     `Sending offer from peer ${localPeerId} to peer ${remotePeerId}`
+  //   );
+  //   socket.emit('webrtc_offer', {
+  //     type: 'webrtc_offer',
+  //     sdp: sessionDescription,
+  //     roomId: roomId,
+  //     senderId: localPeerId,
+  //     receiverId: remotePeerId,
+  //   });
+  // }
+
+  // async function createAnswer(rtcPeerConnection, remotePeerId) {
+  //   let sessionDescription;
+  //   try {
+  //     sessionDescription = await rtcPeerConnection.createAnswer(offerOptions);
+  //     rtcPeerConnection.setLocalDescription(sessionDescription);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+
+  //   console.log(
+  //     `Sending answer from peer ${localPeerId} to peer ${remotePeerId}`
+  //   );
+  //   socket.emit('webrtc_answer', {
+  //     type: 'webrtc_answer',
+  //     sdp: sessionDescription,
+  //     roomId: roomId,
+  //     senderId: localPeerId,
+  //     receiverId: remotePeerId,
+  //   });
+  // }
+
+  // function setRemoteStream(event, remotePeerId) {
+  //   console.log('Remote stream set');
+  //   if (event.track.kind === 'video') {
+  //     const videoREMOTO = document.createElement('video');
+  //     videoREMOTO.srcObject = event.streams[0];
+  //     videoREMOTO.id = 'remotevideo_' + remotePeerId;
+  //     videoREMOTO.setAttribute('autoplay', '');
+  //     videoREMOTO.style.backgroundColor = 'red';
+  //     // videoChatContainer.append(videoREMOTO);
+  //   }
+  // }
+
+  // function sendIceCandidate(event, remotePeerId) {
+  //   if (event.candidate) {
+  //     console.log(
+  //       `Sending ICE Candidate from peer ${localPeerId} to peer ${remotePeerId}`
+  //     );
+  //     socket.emit('webrtc_ice_candidate', {
+  //       senderId: localPeerId,
+  //       receiverId: remotePeerId,
+  //       roomId: roomId,
+  //       label: event.candidate.sdpMLineIndex,
+  //       candidate: event.candidate.candidate,
+  //     });
+  //   }
+  // }
+
+  // function checkPeerDisconnect(event, remotePeerId) {
+  //   var state = peerConnections[remotePeerId].iceConnectionState;
+  //   console.log(`connection with peer ${remotePeerId}: ${state}`);
+  //   if (state === 'failed' || state === 'closed' || state === 'disconnected') {
+  //     //Se eliminar el elemento de vídeo del DOM si se ha desconectado el par
+  //     console.log(`Peer ${remotePeerId} has disconnected`);
+  //     const videoDisconnected = document.getElementById(
+  //       'remotevideo_' + remotePeerId
+  //     );
+  //     videoDisconnected.remove();
+  //   }
+  // }
 
   return (
     <div>
       <h1>Room Page</h1>
-      <h4>{remoteSocketId ? "Connected" : "Waiting for users to join"}</h4>
-      {myStream && <button onClick={sendStreams}>Send Stream</button>}
-      {remoteSocketId && <button onClick={handleCallUser}>CALL</button>}
+      <h4>{remoteSocketId ? 'Connected' : 'Waiting for users to join'}</h4>
+      {myStream && <button>Send Stream</button>}
+      {remoteSocketId && <button>CALL</button>}
       {myStream && (
         <>
           <h1>My Stream</h1>
           <ReactPlayer
             playing
             muted
-            height="100px"
-            width="200px"
+            height='100px'
+            width='200px'
             url={myStream}
           />
         </>
@@ -134,8 +275,8 @@ const RoomPage = () => {
           <ReactPlayer
             playing
             muted
-            height="100px"
-            width="200px"
+            height='100px'
+            width='200px'
             url={remoteStream}
           />
         </>
