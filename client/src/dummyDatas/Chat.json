@@ -1,0 +1,13 @@
+{
+  "you": {
+    "avatar":"https://api.multiavatar.com/you.png?apikey=paIAT14vy2m9Bs",
+    "text": "This is a sample message by the user",
+    "time": "2:34pm"
+  },
+
+  "Boo":{
+    "avatar":"https://api.multiavatar.com/boo.png?apikey=paIAT14vy2m9Bs",
+    "text":"This is a sample message by the user",
+    "time":"2:34pm"
+  }
+}

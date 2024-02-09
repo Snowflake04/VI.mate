@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LobbyScreen from '../screens/Lobby';
-import RoomPage from '../screens/Room';
+import Splash from '../screens/Room/'
 
 const Routers = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<LobbyScreen />} />
-        <Route path='/room/:roomId' element={<RoomPage />} />
+        {/* <Route path='/' element={<LobbyScreen />} /> */}
+        <Route path='/' element={<Splash />} />
+        {/* <Route path='/room/:roomId' element={<RoomPage />} /> */}
       </Routes>
     </BrowserRouter>
   );

@@ -18,6 +18,7 @@ class Peer {
     };
     this.localPeerId = '';
     this.localStream ={};
+    this.remoteStream = {}
     this.rtcPeerConnection = '';
     this.roomId = '';
   }
@@ -34,6 +35,7 @@ class Peer {
 
     this.localStream = stream;
     // localVideoComponent.srcObject = stream;
+    console.log(stream)
   }
 
   addLocalTracks(rtcPeerConnection) {
@@ -67,6 +69,15 @@ class Peer {
     });
   }
 
+
+  setRemoteStream(event, remotePeerId) {
+    console.log('Remote stream set');
+    if (!event.track.kind === 'video') return
+  this.remoteStream[remotePeerId] = event.streams[0]
+  this.socket.emit("newRemoteStream", this.socket.id)
+  }
+
+
   async createAnswer(rtcPeerConnection, remotePeerId) {
     let sessionDescription;
     try {
@@ -90,24 +101,13 @@ class Peer {
     });
   }
 
-  setRemoteStream(event, remotePeerId) {
-    console.log('Remote stream set');
-    if (event.track.kind === 'video') {
-      const videoREMOTO = document.createElement('video');
-      videoREMOTO.srcObject = event.streams[0];
-      videoREMOTO.id = 'remotevideo_' + remotePeerId;
-      videoREMOTO.setAttribute('autoplay', '');
-      videoREMOTO.style.backgroundColor = 'red';
-      // videoChatContainer.append(videoREMOTO);
-    }
-  }
 
   sendIceCandidate(event, remotePeerId) {
     if (event.candidate) {
       console.log(
         `Sending ICE Candidate from peer ${this.localPeerId} to peer ${remotePeerId}`
       );
-      this.socket.emit('IceCandidate', {
+      this.socket.emit('iceCandidate', {
         senderId: this.localPeerId,
         receiverId: remotePeerId,
         roomId: this.roomId,
@@ -127,16 +127,18 @@ class Peer {
 
   async handleIncommingCall(from) {
     const remotePeer = from;
-    let peerConnections = this.peerConnections;
-    peerConnections[remotePeer] = new RTCPeerConnection(this.iceServers);
-    this.addLocalTracks(peerConnections[remotePeer]);
-    peerConnections[remotePeer].ontrack = (event) =>
+    this.peerConnections[remotePeer] = new RTCPeerConnection(this.iceServers);
+    this.addLocalTracks(this.peerConnections[remotePeer]);
+    this.peerConnections[remotePeer].ontrack = (event) =>
       this.setRemoteStream(event, remotePeer);
-    peerConnections[remotePeer].oniceconnectionstatechange = (event) =>
+    this.peerConnections[remotePeer].oniceconnectionstatechange = (event) =>
       this.checkPeerDisconnect(event, remotePeer);
-    peerConnections[remotePeer].onicecandidate = (event) =>
+    this.peerConnections[remotePeer].onicecandidate = (event) =>
       this.sendIceCandidate(event, remotePeer);
-    await this.createOffer(peerConnections[remotePeer], remotePeer);
+    await this.createOffer(this.peerConnections[remotePeer], remotePeer);
+    this.peerConnections[remotePeer].onnegotiationneeded = (event) =>
+    console.log("nego needed", event)
+    console.log(this.peerConnections)
   }
 
   async handleRTCOffer(offer) {
@@ -144,23 +146,25 @@ class Peer {
       `Socket event callback: webrtc_offer. RECEIVED from ${offer.senderId}`
     );
     const remotePeerId = offer.senderId;
-    let peerConnections = this.peerConnections;
-    peerConnections[remotePeerId] = new RTCPeerConnection(this.iceServers);
+    this.peerConnections[remotePeerId] = new RTCPeerConnection(this.iceServers);
     console.log(new RTCSessionDescription(offer.sdp));
-    peerConnections[remotePeerId].setRemoteDescription(
+    this.peerConnections[remotePeerId].setRemoteDescription(
       new RTCSessionDescription(offer.sdp)
     );
     console.log(
       `Remote description set on peer ${this.localPeerId} after offer received`
     );
-    this.addLocalTracks(peerConnections[remotePeerId]);
-    peerConnections[remotePeerId].ontrack = (event) =>
+    this.addLocalTracks(this.peerConnections[remotePeerId]);
+    this.peerConnections[remotePeerId].ontrack = (event) =>
       this.setRemoteStream(event, remotePeerId);
-    peerConnections[remotePeerId].oniceconnectionstatechange = (event) =>
+    this.peerConnections[remotePeerId].oniceconnectionstatechange = (event) =>
       this.checkPeerDisconnect(event, remotePeerId);
-    peerConnections[remotePeerId].onicecandidate = (event) =>
+    this.peerConnections[remotePeerId].onicecandidate = (event) =>
       this.sendIceCandidate(event, remotePeerId);
-    await this.createAnswer(peerConnections[remotePeerId], remotePeerId);
+    await this.createAnswer(this.peerConnections[remotePeerId], remotePeerId);
+    this.peerConnections[remotePeerId].onnegotiationneeded = (event) =>
+    console.log("nego needed", event)
+    console.log(this.peerConnections)
   }
 
   async handleRTCAnswer(offer) {
@@ -174,7 +178,6 @@ class Peer {
       new RTCSessionDescription(offer.sdp)
     );
     //addLocalTracks(peerConnections[event.senderId])
-    console.log(new RTCSessionDescription(offer.sdp));
   }
 
   handleIceCandidate(offer) {
