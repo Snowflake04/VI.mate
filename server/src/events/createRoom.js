@@ -24,11 +24,15 @@ module.exports = ({ server, socket }, user) => {
     for (let i = poolOffset - size; i < poolOffset; i++) {
       id += CharNumSet[pool[i] & 63];
     }
-    return id;
+    return id.match(/.{1,4}/g).join('-');
   };
 
-  let room = GenerateUUID()
-  room = room.match(/.{1,4}/g).join("-")
-  socket.join(room)
-  server.to(socket.id).emit("newRoomCreated", room)
+  let room = GenerateUUID();
+
+  while (!/^[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}$/.test(room)) {
+    room = GenerateUUID();
+  }
+
+  socket.join(room);
+  server.to(socket.id).emit('newRoomCreated', room);
 };
