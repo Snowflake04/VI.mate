@@ -23,7 +23,6 @@ const VideoScreen = ({localStream, remoteStreams}) => {
             <ReactPlayer
               key={stream.id}
               playing
-              muted
               height='100px'
               width='200px'
               url={stream}
