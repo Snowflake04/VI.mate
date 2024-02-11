@@ -51,8 +51,8 @@ const Header = styled.div`
 
   &::after {
     content: '';
-    background: #e7e5e5;
-    height: 1px;
+    background: #c0bebe;
+    height: 2px;
     width: 80%;
     position: absolute;
     bottom: 0;

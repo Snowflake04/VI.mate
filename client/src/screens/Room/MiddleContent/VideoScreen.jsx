@@ -1,12 +1,18 @@
 import styled from 'styled-components';
 import local from '../../../dummyDatas/local.png';
 import remote from '../../../dummyDatas/remote.png';
+import ReactPlayer from 'react-player';
 
-const VideoScreen = () => {
+
+const VideoScreen = ({localStream, remoteStream}) => {
   return (
     <Container>
       <LocalStream>
-        <img src={local}></img>
+        <ReactPlayer   
+          url={localStream}
+          playing={true}
+          width={'100%'}
+          />
       </LocalStream>
       <RemoteStream>
         <RemoteStreamContainer>
@@ -55,7 +61,6 @@ const RemoteStream = styled.div`
   border-radius: 15px;
   margin-top: 5px;
   display: grid;
-  height: 100%;
   gap: 12px;
   overflow: hidden;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -67,8 +72,13 @@ const RemoteStream = styled.div`
 const RemoteStreamContainer = styled.div`
   border-radius: 15px;
   overflow:hidden;
+
   
   img{
     height:100%;
+  }
+
+  &:nth-child(4){
+    filter: blur(1px)
   }
 `;
