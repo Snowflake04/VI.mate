@@ -4,30 +4,35 @@ import remote from '../../../dummyDatas/remote.png';
 import ReactPlayer from 'react-player';
 
 
-const VideoScreen = ({localStream, remoteStream}) => {
+const VideoScreen = ({localStream, remoteStreams}) => {
+  console.log("video render" , remoteStreams)
   return (
     <Container>
       <LocalStream>
         <ReactPlayer   
           url={localStream}
           playing={true}
+          muted
           width={'100%'}
           />
       </LocalStream>
       <RemoteStream>
-        <RemoteStreamContainer>
-          <img src={remote} alt='' />
-        </RemoteStreamContainer>
-        <RemoteStreamContainer>
-          <img src={remote} alt='' />
-        </RemoteStreamContainer>
-        <RemoteStreamContainer>
-          <img src={remote} alt='' />
-        </RemoteStreamContainer>
-        <RemoteStreamContainer>
-          <img src={remote} alt='' />
-        </RemoteStreamContainer>
-      </RemoteStream>
+      {remoteStreams &&
+      Object.values(remoteStreams).map((stream) => (
+       <RemoteStreamContainer>
+            <ReactPlayer
+              key={stream.id}
+              playing
+              muted
+              height='100px'
+              width='200px'
+              url={stream}
+            />
+            </RemoteStreamContainer>
+        
+          ))}
+        
+        </RemoteStream>
     </Container>
   );
 };
