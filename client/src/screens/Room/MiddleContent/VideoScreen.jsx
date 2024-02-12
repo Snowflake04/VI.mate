@@ -1,37 +1,39 @@
 import styled from 'styled-components';
-import local from '../../../dummyDatas/local.png';
-import remote from '../../../dummyDatas/remote.png';
 import ReactPlayer from 'react-player';
+import { useEffect, useCallback} from 'react';
+import { getPeer, useSocket } from '../../../context/SocketProvider';
+import { useStream } from '../../../context/StreamProvider';
 
+const VideoScreen = () => {
+  const Peer = getPeer();
+  const socket = useSocket();
+  const { remoteStream, setRemoteStream } = useStream();
 
-const VideoScreen = ({localStream, remoteStreams}) => {
-  console.log("video render" , remoteStreams)
+  console.log('video screen re-render');
+
+  const handleNewStream = useCallback(() => {
+    console.log('updating...');
+    setRemoteStream({ ...Peer.remoteStream });
+  });
+
+  useEffect(() => {
+    socket.on('newStream', handleNewStream);
+    return () => socket.off('newStream', handleNewStream);
+  }, [handleNewStream]);
+
   return (
     <Container>
       <LocalStream>
-        <ReactPlayer   
-          url={localStream}
-          playing={true}
-          muted
-          width={'100%'}
-          />
+        <Player url={Peer.localStream} playing width={'100%'} muted />
       </LocalStream>
       <RemoteStream>
-      {remoteStreams &&
-      Object.values(remoteStreams).map((stream) => (
-       <RemoteStreamContainer>
-            <ReactPlayer
-              key={stream.id}
-              playing
-              height='100px'
-              width='200px'
-              url={stream}
-            />
+        {remoteStream &&
+          Object.values(remoteStream).map((stream) => (
+            <RemoteStreamContainer key={stream.id}>
+              <Player playing width={'100%'} url={stream} />
             </RemoteStreamContainer>
-        
           ))}
-        
-        </RemoteStream>
+      </RemoteStream>
     </Container>
   );
 };
@@ -66,23 +68,29 @@ const RemoteStream = styled.div`
   margin-top: 5px;
   display: grid;
   gap: 12px;
+  max-height:100%;
+  grid-template:1fr/ 1fr 1fr 1fr 1fr;
   overflow: hidden;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
   img {
     width: 100%;
+  }
+  & > div:nth-child(n + 5) {
+    display: none;
   }
 `;
 
 const RemoteStreamContainer = styled.div`
   border-radius: 15px;
-  overflow:hidden;
-
-  
-  img{
-    height:100%;
+  overflow: hidden;
+  img {
+    height: 100%;
   }
+`;
 
-  &:nth-child(4){
-    filter: blur(1px)
-  }
+const Player = styled(ReactPlayer)`
+  transform: scaleX(-1);
+  border-radius: 15px;
+  background-color: #4b4b4b;
+  aspect-ratio: 16/9;
+  height: auto !important;
 `;

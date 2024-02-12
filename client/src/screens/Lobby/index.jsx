@@ -59,9 +59,9 @@ const LobbyScreen = () => {
   };
 
   const joinRoom = async (room) => {
-    peer.roomId = room;
+    peer.roomId = room.roomCode;
     await peer.setLocalStream();
-    navigate(`/room/${room}`);
+    navigate(`/room/${room.roomCode}`);
     socket.emit('createCall', {
       roomId: peer.roomId,
       from: peer.localPeerId,

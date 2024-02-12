@@ -19,4 +19,5 @@ const Container = styled.div`
   grid-template: 4fr 6fr/1fr;
   border-radius: 19px;
   overflow:hidden;
+  filter: drop-shadow(0 0 2px  #d5d5d5);
 `;
