@@ -1,5 +1,9 @@
 module.exports = ({ server, socket }, userName, roomCode) => {
+  const room = server.rooms.get(roomCode);
+  room.participants[userName] = socket.id;
   socket.join(roomCode);
-  server.to(socket.id).emit('roomJoined', roomCode);
-  server.to(roomCode).emit('newUserJoined', { userName, id: socket.id });
+  server.rooms.set(roomCode, room);
+  server.to(socket.id).emit('roomJoined', room);
+  server.to(roomCode).emit('newUserJoined', userName ,{id: socket.id} );
+
 };

@@ -9,8 +9,9 @@ class Client extends Server {
       this.registerSocketEvents(socket);
       console.log('connected socket' + socket.id);
     });
-  }
 
+    this.rooms = new Map();
+  }
   registerSocketEvents(socket) {
     const path = './src/events';
     readdir(path, (err, files) => {

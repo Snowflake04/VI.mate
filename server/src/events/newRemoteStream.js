@@ -1,4 +1,3 @@
-module.exports = ({server, socket}, from) =>{
-    console.log("got event")
-    server.to(socket.id).emit("newStream", from)
-}
+module.exports = ({ server, socket }, from) => {
+  server.to(socket.id).emit('newStream', from);
+};

@@ -33,6 +33,14 @@ module.exports = ({ server, socket }, user) => {
     room = GenerateUUID();
   }
 
+  server.rooms.set(room, {
+    roomCode: room,
+    admin: socket.id,
+    adminName: user,
+    messages: {},
+    participants: { [user]: socket.id },
+  });
+
   socket.join(room);
   server.to(socket.id).emit('newRoomCreated', room);
 };
