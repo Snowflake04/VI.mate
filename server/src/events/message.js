@@ -1,3 +1,7 @@
 module.exports = ({ server, socket }, message, room) => {
-  socket.broadcast.to(room).emit('newMessage', message);
+  let Room = server.rooms.get(room);
+  let messageObj = { user: socket.id, content: message };
+  Room.messages.push(messageObj);
+  server.rooms.set(room, Room);
+  socket.broadcast.to(room).emit('newMessage', messageObj);
 };

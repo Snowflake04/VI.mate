@@ -33,14 +33,17 @@ module.exports = ({ server, socket }, user) => {
     room = GenerateUUID();
   }
 
-  server.rooms.set(room, {
+  const Room = {
     roomCode: room,
     admin: socket.id,
     adminName: user,
-    messages: {},
-    participants: { [user]: socket.id },
-  });
+    messages: [],
+    participants: { [socket.id]: user },
+  };
+
+
+  server.rooms.set(room, Room);
 
   socket.join(room);
-  server.to(socket.id).emit('newRoomCreated', room);
+  server.to(socket.id).emit('newRoomCreated', Room);
 };
