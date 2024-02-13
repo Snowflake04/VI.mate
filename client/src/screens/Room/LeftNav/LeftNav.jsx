@@ -20,7 +20,7 @@ export default LeftNav;
 
 const Container = styled.div`
   height: 100%;
-  width:100%;
+  width: 100%;
   background-color: white;
   max-width: 360px;
   border-radius: 19px;
@@ -45,10 +45,9 @@ const Nav = styled.nav`
   margin-top: 50px;
 `;
 const NavItem = styled.div`
-  font-weight:bold;
-  font-size:${props => props.active? "1.4rem" : "1.1rem"};
-  letter-spacing:1px;
-  cursor:pointer;
-  color: ${props => props.active? "red" : "black"}
-  
+  font-weight: bold;
+  font-size: ${(props) => (props.active ? '1.4rem' : '1.1rem')};
+  letter-spacing: 1px;
+  cursor: pointer;
+  color: ${(props) => (props.active ? 'red' : 'black')};
 `;

@@ -4,7 +4,7 @@ import { useSocket, getPeer } from '../../context/SocketProvider';
 import dotSquare from '../../images/squaredot.png';
 import { TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
+import { useStream } from '../../context/StreamProvider';
 import './Lobby.css';
 
 const LobbyScreen = () => {
@@ -19,6 +19,7 @@ const LobbyScreen = () => {
   const socket = useSocket();
   const navigate = useNavigate();
   const peer = getPeer();
+  const { setMessages, setUserMap } = useStream();
   peer.socket = socket;
   peer.localPeerId = socket.id;
 
@@ -53,14 +54,15 @@ const LobbyScreen = () => {
   };
 
   const joinNewRoom = async (room) => {
-    await peer.setLocalStream();
-    peer.roomId = room;
-    navigate(`/room/${room}`);
+    setUserMap(room.participants);
+    peer.roomId = room.roomCode;
+    navigate(`/room/${room.roomCode}`);
   };
 
   const joinRoom = async (room) => {
     peer.roomId = room.roomCode;
-    await peer.setLocalStream();
+    setUserMap(room.participants);
+    setMessages(room.messages);
     navigate(`/room/${room.roomCode}`);
     socket.emit('createCall', {
       roomId: peer.roomId,

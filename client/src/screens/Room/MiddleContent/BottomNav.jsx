@@ -1,11 +1,14 @@
 import styled from 'styled-components';
+import { getPeer } from '../../../context/SocketProvider';
 
 const BottomNav = () => {
+const Peer = getPeer()
+
   return (
     <Container>
       <RoomDetails>
         <Name>Room for doing something...</Name>
-        <Code>abcd-efgh-ijkl</Code>
+        <Code>{Peer.roomId}</Code>
       </RoomDetails>
       <RoomControls>
         <Control>

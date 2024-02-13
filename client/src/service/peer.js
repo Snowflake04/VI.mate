@@ -16,9 +16,11 @@ class Peer {
         { urls: 'stun:stun1.l.google.com:19302' },
       ],
     };
+    this.setLocalStream();
+
     this.localPeerId = '';
-    this.localStream ={};
-    this.remoteStream = {}
+    this.localStream = {};
+    this.remoteStream = {};
     this.rtcPeerConnection = '';
     this.roomId = '';
   }
@@ -34,12 +36,11 @@ class Peer {
     }
 
     this.localStream = stream;
-    // localVideoComponent.srcObject = stream;
-    console.log(stream)
+    console.log(stream);
   }
 
   addLocalTracks(rtcPeerConnection) {
-    console.log(this.localStream)
+    console.log(this.localStream);
     this.localStream.getTracks().forEach((track) => {
       rtcPeerConnection.addTrack(track, this.localStream);
     });
@@ -69,14 +70,12 @@ class Peer {
     });
   }
 
-
   setRemoteStream(event, remotePeerId) {
     console.log('Remote stream set');
-    if (!event.track.kind === 'video') return
-  this.remoteStream[remotePeerId] = event.streams[0]
-  this.socket.emit("newRemoteStream", this.socket.id)
+    if (!event.track.kind === 'video') return;
+    this.remoteStream[remotePeerId] = event.streams[0];
+    this.socket.emit('newRemoteStream', this.socket.id);
   }
-
 
   async createAnswer(rtcPeerConnection, remotePeerId) {
     let sessionDescription;
@@ -100,7 +99,6 @@ class Peer {
       receiverId: remotePeerId,
     });
   }
-
 
   sendIceCandidate(event, remotePeerId) {
     if (event.candidate) {
@@ -137,8 +135,8 @@ class Peer {
       this.sendIceCandidate(event, remotePeer);
     await this.createOffer(this.peerConnections[remotePeer], remotePeer);
     this.peerConnections[remotePeer].onnegotiationneeded = (event) =>
-    console.log("nego needed", event)
-    console.log(this.peerConnections)
+      console.log('nego needed', event);
+    console.log(this.peerConnections);
   }
 
   async handleRTCOffer(offer) {
@@ -163,8 +161,8 @@ class Peer {
       this.sendIceCandidate(event, remotePeerId);
     await this.createAnswer(this.peerConnections[remotePeerId], remotePeerId);
     this.peerConnections[remotePeerId].onnegotiationneeded = (event) =>
-    console.log("nego needed", event)
-    console.log(this.peerConnections)
+      console.log('nego needed', event);
+    console.log(this.peerConnections);
   }
 
   async handleRTCAnswer(offer) {

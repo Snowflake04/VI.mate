@@ -5,18 +5,22 @@ const StreamContext = createContext();
 export const StreamProvider = ({ children }) => {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [userMap, setUserMap] = useState({});
+
+  let data = {
+    localStream: localStream,
+    remoteStream: remoteStream,
+    setLocalStream: setLocalStream,
+    setRemoteStream: setRemoteStream,
+    messages: messages,
+    setMessages: setMessages,
+    userMap: userMap,
+    setUserMap: setUserMap,
+  };
 
   return (
-    <StreamContext.Provider
-      value={{
-        localStream: localStream,
-        remoteStream: remoteStream,
-        setLocalStream: setLocalStream,
-        setRemoteStream: setRemoteStream,
-      }}
-    >
-      {children}
-    </StreamContext.Provider>
+    <StreamContext.Provider value={data}>{children}</StreamContext.Provider>
   );
 };
 

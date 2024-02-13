@@ -1,12 +1,20 @@
 import styled from 'styled-components';
+import { useCallback } from 'react';
+import { useStream } from '../../../context/StreamProvider';
 
-const UserBubble = ({ user }) => {
+const UserBubble = ({ message }) => {
+  const { userMap } = useStream();
+
+  const getUser = useCallback(() => {
+    return userMap[message.user];
+  });
+
   return (
-    <Container user={user}>
+    <Container user={message.self ? true : null}>
       <Avatar></Avatar>
-      <Message user={user}>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit
-        <Placeholder> {user ? 'You' : 'User'}</Placeholder>
+      <Message user={message.self ? true : null}>
+        {message.content}
+        <Placeholder>{message.self ? 'You' : getUser()}</Placeholder>
       </Message>
     </Container>
   );
@@ -35,13 +43,14 @@ const Message = styled.div`
   margin-right: ${(props) => (props.user ? '8px' : 0)};
   margin-left: ${(props) => (props.user ? 0 : '8px')};
   margin-top: 25px;
-  padding: 8px;
+  padding: 8px 16px;
   color: #605f5f;
   background-color: ${(props) => (props.user ? '#ffffff' : '#75cdb1;')};
   border-radius: ${(props) =>
     props.user ? '20px 0px 20px 20px' : '0px 20px 20px 20px'};
   align-self: flex-end;
   position: relative;
+  z-index:5;
   filter: drop-shadow(5px 5px 2px #bbbbbba9);
 `;
 const Placeholder = styled.div`

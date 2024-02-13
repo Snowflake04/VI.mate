@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
-const Participant = () => {
+const Participant = ({id, username}) => {
   return (
     <Container>
       <Details>
         <Avatar>
           <img src='https://api.multiavatar.com/rand.png?apikey=paIAT14vy2m9Bs' />
         </Avatar>
-        <Name> Alex</Name>
+        <Name> {username}</Name>
       </Details>
       <Controls>
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'>

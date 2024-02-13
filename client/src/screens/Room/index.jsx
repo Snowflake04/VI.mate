@@ -4,15 +4,17 @@ import MiddleContent from './MiddleContent';
 import RightComponent from './RightComponents';
 import { useEffect, useCallback } from 'react';
 import { useSocket, getPeer } from '../../context/SocketProvider';
-import { StreamProvider } from '../../context/StreamProvider';
+import { useStream } from '../../context/StreamProvider';
 
 const Splash = () => {
   const socket = useSocket();
   const Peer = getPeer();
+  const { setUserMap } = useStream();
 
   console.log('room re-render');
   useEffect(() => {
     socket.on('newUserJoined', (username, id) => {
+      setUserMap((prev) => ({ ...prev, [id]: username }));
       //TODO: create a splash for displaying  new user joined message
       console.log('New user joined');
     });
@@ -58,11 +60,9 @@ const Splash = () => {
 
   return (
     <MainContainer>
-      <StreamProvider>
-        <LeftNav />
-        <MiddleContent />
-        <RightComponent />
-      </StreamProvider>
+      <LeftNav />
+      <MiddleContent />
+      <RightComponent />
     </MainContainer>
   );
 };

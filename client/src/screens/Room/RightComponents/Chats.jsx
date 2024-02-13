@@ -1,28 +1,38 @@
 import styled from 'styled-components';
 import ChatBubble from './ChatBubble';
 import { useCallback, useEffect, useRef } from 'react';
-import { useSocket, getPeer  } from '../../../context/SocketProvider';
-import sampleChat from '../../../dummyDatas/Chat.json';
+import { useSocket, getPeer } from '../../../context/SocketProvider';
+import { useStream } from '../../../context/StreamProvider';
 
 const Chats = () => {
   const socket = useSocket();
-  const Peer = getPeer()
+  const Peer = getPeer();
   const inputRef = useRef();
+  const chatAreaRef = useRef();
+  const { messages, setMessages } = useStream();
 
+  console.log(messages);
+  useEffect(() => {
+    socket.on('newMessage', handleMessage);
+    return () => {
+      socket.off('newMessage', handleMessage);
+    };
+  }, []);
 
-  useEffect(()=>{
-    socket.on('newMessage', handleMessage)
-    return () => {socket.off('newMessage')}
-    }, [])
-
-    const handleMessage = useCallback(message =>{
-      
-    })
+  const handleMessage = useCallback((message) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+  });
 
   const handleSendButton = () => {
     const message = inputRef.current.value;
     if (message) {
       socket.emit('message', message, Peer.roomId);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { content: message, self: true },
+      ]);
+      inputRef.current.value = '';
+      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
   };
 
@@ -30,22 +40,12 @@ const Chats = () => {
     <Container>
       <Header>
         Chats
-        <Counter>10</Counter>
+        <Counter>{messages.length}</Counter>
       </Header>
-      <ChatArea>
-        <ChatBubble user />
-        <ChatBubble user />
-        <ChatBubble />
-        <ChatBubble user />
-        <ChatBubble />
-        <ChatBubble user />
-        <ChatBubble />
-        <ChatBubble user />
-        <ChatBubble />
-        <ChatBubble user />
-        <ChatBubble />
-        <ChatBubble user />
-        <ChatBubble />
+      <ChatArea ref={chatAreaRef}>
+        {messages.map((msg, index) => (
+          <ChatBubble key={index} message={msg} />
+        ))}
       </ChatArea>
       <TextArea>
         <Input type='text' placeholder='Type your message...' ref={inputRef} />
@@ -103,6 +103,7 @@ const ChatArea = styled.div`
   /* margin-top:12px; */
   background: linear-gradient(#ffffff, #d7cafa);
   height: 100%;
+  padding:0 10vpx;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;
