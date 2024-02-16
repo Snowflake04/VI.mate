@@ -7,7 +7,7 @@ class Client extends Server {
     super(...server);
     this.on('connection', (socket) => {
       this.registerSocketEvents(socket);
-      console.log('connected socket' + socket.id);
+      console.log('connected socket ' + socket.id);
     });
 
     this.rooms = new Map();
