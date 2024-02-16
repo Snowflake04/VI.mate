@@ -6,7 +6,7 @@ const UserBubble = ({ message }) => {
   const { userMap } = useStream();
 
   const getUser = useCallback(() => {
-    return userMap[message.user];
+    return userMap[message.user] || 'user';
   });
 
   return (
@@ -50,7 +50,7 @@ const Message = styled.div`
     props.user ? '20px 0px 20px 20px' : '0px 20px 20px 20px'};
   align-self: flex-end;
   position: relative;
-  z-index:5;
+  z-index: 5;
   filter: drop-shadow(5px 5px 2px #bbbbbba9);
 `;
 const Placeholder = styled.div`

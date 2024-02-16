@@ -74,7 +74,12 @@ class Peer {
     console.log('Remote stream set');
     if (!event.track.kind === 'video') return;
     this.remoteStream[remotePeerId] = event.streams[0];
-    this.socket.emit('newRemoteStream', this.socket.id);
+    this.socket.emit('remoteStreamUpdate', this.socket.id);
+  }
+
+  removeRemoteStream(remotePeerId) {
+    delete this.remoteStream[remotePeerId];
+    this.socket.emit('remoteStreamUpdate', this.socket.id);
   }
 
   async createAnswer(rtcPeerConnection, remotePeerId) {
@@ -175,7 +180,6 @@ class Peer {
     this.peerConnections[offer.senderId].setRemoteDescription(
       new RTCSessionDescription(offer.sdp)
     );
-    //addLocalTracks(peerConnections[event.senderId])
   }
 
   handleIceCandidate(offer) {

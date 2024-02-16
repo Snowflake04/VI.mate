@@ -56,14 +56,14 @@ const LobbyScreen = () => {
   const joinNewRoom = async (room) => {
     setUserMap(room.participants);
     peer.roomId = room.roomCode;
-    navigate(`/room/${room.roomCode}`);
+    navigate(`/room/${room.roomCode}`, { replace: true });
   };
 
   const joinRoom = async (room) => {
     peer.roomId = room.roomCode;
     setUserMap(room.participants);
     setMessages(room.messages);
-    navigate(`/room/${room.roomCode}`);
+    navigate(`/room/${room.roomCode}`, { replace: true });
     socket.emit('createCall', {
       roomId: peer.roomId,
       from: peer.localPeerId,

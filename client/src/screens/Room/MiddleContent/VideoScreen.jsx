@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import ReactPlayer from 'react-player';
-import { useEffect, useCallback} from 'react';
+import { useEffect, useCallback } from 'react';
 import { getPeer, useSocket } from '../../../context/SocketProvider';
 import { useStream } from '../../../context/StreamProvider';
 
@@ -11,15 +11,15 @@ const VideoScreen = () => {
 
   console.log('video screen re-render');
 
-  const handleNewStream = useCallback(() => {
+  const handleStreamUpdate = useCallback(() => {
     console.log('updating...');
     setRemoteStream({ ...Peer.remoteStream });
   });
 
   useEffect(() => {
-    socket.on('newStream', handleNewStream);
-    return () => socket.off('newStream', handleNewStream);
-  }, [handleNewStream]);
+    socket.on('remoteStreamUpdate', handleStreamUpdate);
+    return () => socket.off('remoteStreamUpdate', handleStreamUpdate);
+  }, [handleStreamUpdate]);
 
   return (
     <Container>
@@ -68,8 +68,8 @@ const RemoteStream = styled.div`
   margin-top: 5px;
   display: grid;
   gap: 12px;
-  max-height:100%;
-  grid-template:1fr/ 1fr 1fr 1fr 1fr;
+  max-height: 100%;
+  grid-template: 1fr/ 1fr 1fr 1fr 1fr;
   overflow: hidden;
   img {
     width: 100%;

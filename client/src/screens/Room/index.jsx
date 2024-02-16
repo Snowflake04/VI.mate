@@ -22,11 +22,13 @@ const Splash = () => {
     socket.on('RTCOffer', handleOffer);
     socket.on('RTCAnswer', handleAnswer);
     socket.on('iceCandidate', handleICECandidate);
+    socket.on('userDisconnected', removeUser);
     return () => {
       socket.off('incommingCall', handleCall);
       socket.off('RTCOffer', handleOffer);
       socket.off('RTCAnswer', handleAnswer);
       socket.off('iceCandidate', handleICECandidate);
+      socket.off('userDisconnected', removeUser);
     };
   }, []);
 
@@ -56,6 +58,19 @@ const Splash = () => {
       Peer.handleIceCandidate(offer);
     },
     [Peer]
+  );
+
+  const removeUser = useCallback(
+    (userId) => {
+      setUserMap((prevUserMap) => {
+        const newUserMap = { ...prevUserMap };
+        delete newUserMap[userId];
+        return newUserMap;
+      });
+
+      Peer.removeRemoteStream(userId);
+    },
+    [setUserMap]
   );
 
   return (
