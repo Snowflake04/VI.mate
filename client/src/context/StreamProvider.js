@@ -7,7 +7,7 @@ export const getPeer = () => {
   if (peer) {
     return peer;
   } else {
-    peer = Peer('https://server-ipb4.onrender.com');
+    peer = Peer('http://localhost:8000');
     return peer;
   }
 };
