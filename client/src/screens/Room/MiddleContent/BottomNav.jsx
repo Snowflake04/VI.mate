@@ -1,18 +1,17 @@
 import styled from 'styled-components';
-import { getPeer } from '../../../context/SocketProvider';
-import { useNavigate } from "react-router-dom";
+import { getPeer } from '../../../context/StreamProvider';
+import { useNavigate } from 'react-router-dom';
 
 const BottomNav = () => {
   const Peer = getPeer();
   const navigate = useNavigate();
 
-
   const handleLeaveButton = () => {
-    Peer.socket.emit("disconnected", Peer.roomId)
-    Peer.socket.disconnect();
-    navigate('/',{
-      replace:true
-    })
+    Peer.emit('disconnected', Peer.roomId);
+    Peer.disconnect();
+    navigate('/', {
+      replace: true,
+    });
   };
 
   return (

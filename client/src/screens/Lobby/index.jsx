@@ -1,10 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSocket, getPeer } from '../../context/SocketProvider';
 import dotSquare from '../../images/squaredot.png';
 import { TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useStream } from '../../context/StreamProvider';
+import { useStream, getPeer } from '../../context/StreamProvider';
 import './Lobby.css';
 
 const LobbyScreen = () => {
@@ -16,12 +15,11 @@ const LobbyScreen = () => {
     error: false,
     errorMessage: '',
   });
-  const socket = useSocket();
-  const navigate = useNavigate();
-  const peer = getPeer();
+  
   const { setMessages, setUserMap } = useStream();
-  peer.socket = socket;
-  peer.localPeerId = socket.id;
+  const navigate = useNavigate();
+  const Peer = getPeer();
+  console.log( Peer);
 
   const validateUsername = () => {
     if (username === '') {
@@ -44,40 +42,40 @@ const LobbyScreen = () => {
   };
 
   const createRoom = useCallback((e) => {
-    if (validateUsername()) socket.emit('createRoom', username);
+    if (validateUsername()) Peer.emit('createRoom', username);
   });
 
   const handleJoinButton = () => {
     if (validateUsername() && ValidateRoomCode()) {
-      socket.emit('joinRoom', username, roomCode);
+      Peer.emit('joinRoom', username, roomCode);
     }
   };
 
   const joinNewRoom = async (room) => {
     setUserMap(room.participants);
-    peer.roomId = room.roomCode;
+    Peer.roomId = room.roomCode;
     navigate(`/room/${room.roomCode}`, { replace: true });
   };
 
   const joinRoom = async (room) => {
-    peer.roomId = room.roomCode;
+    Peer.roomId = room.roomCode;
     setUserMap(room.participants);
     setMessages(room.messages);
     navigate(`/room/${room.roomCode}`, { replace: true });
-    socket.emit('createCall', {
-      roomId: peer.roomId,
-      from: peer.localPeerId,
+    Peer.emit('createCall', {
+      roomId: Peer.roomId,
+      from: Peer.id,
     });
   };
 
   useEffect(() => {
-    socket.on('newRoomCreated', joinNewRoom);
-    socket.on('roomJoined', joinRoom);
+    Peer.on('newRoomCreated', joinNewRoom);
+    Peer.on('roomJoined', joinRoom);
     return () => {
-      socket.off('newRoomCreated', joinNewRoom);
-      socket.off('roomJoined', joinRoom);
+      Peer.off('newRoomCreated', joinNewRoom);
+      Peer.off('roomJoined', joinRoom);
     };
-  }, [socket]);
+  }, [Peer]);
 
   return (
     <div className='lobby'>

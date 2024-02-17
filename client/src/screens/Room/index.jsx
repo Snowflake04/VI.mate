@@ -3,32 +3,30 @@ import LeftNav from './LeftNav/LeftNav';
 import MiddleContent from './MiddleContent';
 import RightComponent from './RightComponents';
 import { useEffect, useCallback } from 'react';
-import { useSocket, getPeer } from '../../context/SocketProvider';
-import { useStream } from '../../context/StreamProvider';
+import { useStream, getPeer } from '../../context/StreamProvider';
 
 const Splash = () => {
-  const socket = useSocket();
   const Peer = getPeer();
   const { setUserMap } = useStream();
 
   console.log('room re-render');
   useEffect(() => {
-    socket.on('newUserJoined', (username, id) => {
+    Peer.on('newUserJoined', (username, id) => {
       setUserMap((prev) => ({ ...prev, [id]: username }));
       //TODO: create a splash for displaying  new user joined message
       console.log('New user joined');
     });
-    socket.on('incommingCall', handleCall);
-    socket.on('RTCOffer', handleOffer);
-    socket.on('RTCAnswer', handleAnswer);
-    socket.on('iceCandidate', handleICECandidate);
-    socket.on('userDisconnected', removeUser);
+    Peer.on('incommingCall', handleCall);
+    Peer.on('RTCOffer', handleOffer);
+    Peer.on('RTCAnswer', handleAnswer);
+    Peer.on('iceCandidate', handleICECandidate);
+    Peer.on('userDisconnected', removeUser);
     return () => {
-      socket.off('incommingCall', handleCall);
-      socket.off('RTCOffer', handleOffer);
-      socket.off('RTCAnswer', handleAnswer);
-      socket.off('iceCandidate', handleICECandidate);
-      socket.off('userDisconnected', removeUser);
+      Peer.off('incommingCall', handleCall);
+      Peer.off('RTCOffer', handleOffer);
+      Peer.off('RTCAnswer', handleAnswer);
+      Peer.off('iceCandidate', handleICECandidate);
+      Peer.off('userDisconnected', removeUser);
     };
   }, []);
 

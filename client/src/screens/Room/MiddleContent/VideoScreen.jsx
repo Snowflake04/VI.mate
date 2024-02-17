@@ -1,12 +1,10 @@
 import styled from 'styled-components';
 import ReactPlayer from 'react-player';
 import { useEffect, useCallback } from 'react';
-import { getPeer, useSocket } from '../../../context/SocketProvider';
-import { useStream } from '../../../context/StreamProvider';
+import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = () => {
   const Peer = getPeer();
-  const socket = useSocket();
   const { remoteStream, setRemoteStream } = useStream();
 
   console.log('video screen re-render');
@@ -17,8 +15,8 @@ const VideoScreen = () => {
   });
 
   useEffect(() => {
-    socket.on('remoteStreamUpdate', handleStreamUpdate);
-    return () => socket.off('remoteStreamUpdate', handleStreamUpdate);
+    Peer.on('remoteStreamUpdate', handleStreamUpdate);
+    return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
   }, [handleStreamUpdate]);
 
   return (

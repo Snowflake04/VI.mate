@@ -1,6 +1,16 @@
 import { createContext, useContext, useState } from 'react';
+import {getPeer as Peer} from '../peer';
 
-const StreamContext = createContext();
+const StreamContext = createContext(null);
+let peer;
+export const getPeer = () => {
+  if (peer) {
+    return peer;
+  } else {
+    peer = Peer('http://localhost:8000');
+    return peer;
+  }
+};
 
 export const StreamProvider = ({ children }) => {
   const [localStream, setLocalStream] = useState(null);

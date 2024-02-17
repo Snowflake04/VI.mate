@@ -1,36 +1,23 @@
-class Peer {
-  constructor() {
-    this.mediaConstraints = {
-      audio: true,
-      video: true,
-    };
-    this.offerOptions = {
-      offerToReceiveVideo: 1,
-      offerToReceiveAudio: 1,
-    };
+import { Socket } from 'socket.io-client';
+import { config } from './config';
 
+class Peer extends Socket {
+  constructor(io, nsp, opts) {
+    super(io, nsp, opts);
     this.peerConnections = {};
-    this.iceServers = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-      ],
-    };
-    this.setLocalStream();
-
-    this.localPeerId = '';
-    this.localStream = {};
     this.remoteStream = {};
     this.rtcPeerConnection = '';
     this.roomId = '';
+    this.localStream = '';
+    this.setLocalStream();
   }
-
   async setLocalStream() {
-    let mediaConstraints = this.mediaConstraints;
     console.log('Local stream set');
     let stream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      stream = await navigator.mediaDevices.getUserMedia(
+        config.mediaConstraints
+      );
     } catch (error) {
       console.error('Could not get user media', error);
     }
@@ -40,7 +27,6 @@ class Peer {
   }
 
   addLocalTracks(rtcPeerConnection) {
-    console.log(this.localStream);
     this.localStream.getTracks().forEach((track) => {
       rtcPeerConnection.addTrack(track, this.localStream);
     });
@@ -51,7 +37,7 @@ class Peer {
     let sessionDescription;
     try {
       sessionDescription = await rtcPeerConnection.createOffer(
-        this.offerOptions
+        config.offerOptions
       );
       rtcPeerConnection.setLocalDescription(sessionDescription);
     } catch (error) {
@@ -59,13 +45,13 @@ class Peer {
     }
 
     console.log(
-      `Sending offer from peer ${this.localPeerId} to peer ${remotePeerId}`
+      `Sending offer from peer ${this.id} to peer ${remotePeerId}`
     );
-    this.socket.emit('newRTCOffer', {
+    this.emit('newRTCOffer', {
       type: 'webrtc_offer',
       sdp: sessionDescription,
       roomId: this.roomId,
-      senderId: this.localPeerId,
+      senderId: this.id,
       receiverId: remotePeerId,
     });
   }
@@ -74,19 +60,19 @@ class Peer {
     console.log('Remote stream set');
     if (!event.track.kind === 'video') return;
     this.remoteStream[remotePeerId] = event.streams[0];
-    this.socket.emit('remoteStreamUpdate', this.socket.id);
+    this.emit('remoteStreamUpdate', this.id);
   }
 
   removeRemoteStream(remotePeerId) {
     delete this.remoteStream[remotePeerId];
-    this.socket.emit('remoteStreamUpdate', this.socket.id);
+    this.emit('remoteStreamUpdate', this.id);
   }
 
   async createAnswer(rtcPeerConnection, remotePeerId) {
     let sessionDescription;
     try {
       sessionDescription = await rtcPeerConnection.createAnswer(
-        this.offerOptions
+        config.offerOptions
       );
       rtcPeerConnection.setLocalDescription(sessionDescription);
     } catch (error) {
@@ -94,13 +80,13 @@ class Peer {
     }
 
     console.log(
-      `Sending answer from peer ${this.localPeerId} to peer ${remotePeerId}`
+      `Sending answer from peer ${this.id} to peer ${remotePeerId}`
     );
-    this.socket.emit('RTCAnswer', {
+    this.emit('RTCAnswer', {
       type: 'webrtc_answer',
       sdp: sessionDescription,
       roomId: this.roomId,
-      senderId: this.localPeerId,
+      senderId: this.id,
       receiverId: remotePeerId,
     });
   }
@@ -108,10 +94,10 @@ class Peer {
   sendIceCandidate(event, remotePeerId) {
     if (event.candidate) {
       console.log(
-        `Sending ICE Candidate from peer ${this.localPeerId} to peer ${remotePeerId}`
+        `Sending ICE Candidate from peer ${this.id} to peer ${remotePeerId}`
       );
-      this.socket.emit('iceCandidate', {
-        senderId: this.localPeerId,
+      this.emit('iceCandidate', {
+        senderId: this.id,
         receiverId: remotePeerId,
         roomId: this.roomId,
         label: event.candidate.sdpMLineIndex,
@@ -128,9 +114,9 @@ class Peer {
     }
   }
 
-  async handleIncommingCall(from) {
-    const remotePeer = from;
-    this.peerConnections[remotePeer] = new RTCPeerConnection(this.iceServers);
+  async handleIncommingCall(remotePeer) {
+    console.log(remotePeer)
+    this.peerConnections[remotePeer] = new RTCPeerConnection(config.iceServers);
     this.addLocalTracks(this.peerConnections[remotePeer]);
     this.peerConnections[remotePeer].ontrack = (event) =>
       this.setRemoteStream(event, remotePeer);
@@ -149,13 +135,15 @@ class Peer {
       `Socket event callback: webrtc_offer. RECEIVED from ${offer.senderId}`
     );
     const remotePeerId = offer.senderId;
-    this.peerConnections[remotePeerId] = new RTCPeerConnection(this.iceServers);
+    this.peerConnections[remotePeerId] = new RTCPeerConnection(
+      config.iceServers
+    );
     console.log(new RTCSessionDescription(offer.sdp));
     this.peerConnections[remotePeerId].setRemoteDescription(
       new RTCSessionDescription(offer.sdp)
     );
     console.log(
-      `Remote description set on peer ${this.localPeerId} after offer received`
+      `Remote description set on peer ${this.id} after offer received`
     );
     this.addLocalTracks(this.peerConnections[remotePeerId]);
     this.peerConnections[remotePeerId].ontrack = (event) =>
@@ -175,7 +163,7 @@ class Peer {
       `Socket event callback: webrtc_answer. RECEIVED from ${offer.senderId}`
     );
     console.log(
-      `Remote description set on peer ${this.localPeerId} after answer received`
+      `Remote description set on peer ${this.id} after answer received`
     );
     this.peerConnections[offer.senderId].setRemoteDescription(
       new RTCSessionDescription(offer.sdp)

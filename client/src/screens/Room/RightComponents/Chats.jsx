@@ -1,11 +1,9 @@
 import styled from 'styled-components';
 import ChatBubble from './ChatBubble';
 import { useCallback, useEffect, useRef } from 'react';
-import { useSocket, getPeer } from '../../../context/SocketProvider';
-import { useStream } from '../../../context/StreamProvider';
+import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const Chats = () => {
-  const socket = useSocket();
   const Peer = getPeer();
   const inputRef = useRef();
   const chatAreaRef = useRef();
@@ -13,9 +11,9 @@ const Chats = () => {
 
   console.log(messages);
   useEffect(() => {
-    socket.on('newMessage', handleMessage);
+    Peer.on('newMessage', handleMessage);
     return () => {
-      socket.off('newMessage', handleMessage);
+      Peer.off('newMessage', handleMessage);
     };
   }, []);
 
@@ -26,7 +24,7 @@ const Chats = () => {
   const handleSendButton = () => {
     const message = inputRef.current.value;
     if (message) {
-      socket.emit('message', message, Peer.roomId);
+      Peer.emit('message', message, Peer.roomId);
       setMessages((prevMessages) => [
         ...prevMessages,
         { content: message, self: true },
