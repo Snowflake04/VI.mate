@@ -1,0 +1,136 @@
+.lobby {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: linear-gradient(#2a3d62, #5c9fec);
+  color: white;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.left_content {
+  display: grid;
+  place-items: center;
+}
+
+.left_content img:nth-child(3) {
+  position: relative;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px 0 rgba(250, 244, 244, 0.238), 0 6px 20px 0 rgba(134, 116, 116, 0.436);
+}
+
+.image_container {
+  position: relative;
+}
+
+.left_content .image_container img:nth-child(1) {
+  position: absolute;
+  height: 150px;
+  left: 0;
+  bottom: 0;
+  border-radius: 5px;
+  transform: translate(-15px, 15px);
+  animation: outRight 1s;
+}
+
+@keyframes outRight{
+  0% {transform: translateX(0px)}
+  100% {transform: translate(-15px,15px)}
+}
+
+.left_content .image_container img:nth-child(2) {
+  position: absolute;
+  height: 150px;
+  right: 0;
+  top: 0;
+  rotate: 180deg;
+  border-radius: 5px;
+  transform: translate(-20px, 20px);
+  animation: outLeft 1s;
+}
+@keyframes outLeft{
+  0% {transform: translateX(0px)}
+  100% {transform: translate(-20px,20px)}
+}
+
+.right_content {
+  display: grid;
+  place-content: center;
+  margin: 10%;
+  text-align: justify;
+}
+
+.right_content .head {
+  font-size: 2.1rem;
+  padding-bottom: 20px;
+  text-align: start;
+}
+
+.right_content .sub_text {
+  line-height: 25px;
+  max-width: 500px;
+}
+
+.right_content .button_holder {
+  display: flex;
+  justify-content: start;
+  gap: 40px;
+  max-width: 500px;
+  margin-top: 20px;
+}
+
+.right_content .button_holder button {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 100vh;
+  border: 1px solid white;
+  color: white;
+  background: transparent;
+}
+
+.right_content button:nth-child(1):hover {
+  transform: scale(1.1);
+  background-color: rgb(252, 6, 35);
+  transition: 0.4s ease all;
+}
+
+.right_content button:nth-child(2):hover {
+  transform: scale(1.1);
+  background-color: rgb(220, 204, 57);
+  transition: 0.4s ease all;
+}
+
+.right_content .meeting_section {
+  display: flex;
+  
+  margin-top: 20px;
+  gap: 20px;
+  animation: dropdown 1s;
+}
+
+@keyframes dropdown {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.right_content .meeting_section input{
+  height: 18px;
+}
+
+.right_content .meeting_section button {
+  font-size: 14px;
+  height: 35px;
+  padding: 0px 20px;
+  border-radius: 100vh;
+  border: 1px solid rgb(166, 176, 233);
+  background: none;
+  cursor: pointer;
+  color: white;
+}
