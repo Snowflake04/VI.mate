@@ -7,14 +7,16 @@ const UserBubble = ({ message }) => {
 
   const getUser = useCallback(() => {
     return userMap[message.user] || 'user';
-  },[userMap]);
+  }, [userMap]);
 
   return (
     <Container user={message.self ? true : null}>
       <Avatar></Avatar>
       <Message user={message.self ? true : null}>
         {message.content}
-        <Placeholder>{message.self ? 'You' : getUser()}</Placeholder>
+        <Placeholder user={message.self ? true : null}>
+          {message.self ? 'You' : getUser()}
+        </Placeholder>
       </Message>
     </Container>
   );
@@ -37,13 +39,15 @@ const Avatar = styled.div`
 `;
 
 const Message = styled.div`
-  width: 100%;
+  max-width: 100%;
   font-size: 16px;
-  min-height: 25px;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
   margin-right: ${(props) => (props.user ? '8px' : 0)};
-  margin-left: ${(props) => (props.user ? 0 : '8px')};
+  margin-left: ${(props) => (props.user ? 0 : '6px')};
   margin-top: 25px;
-  padding: 8px 16px;
+  padding: 8px;
   color: #605f5f;
   background-color: ${(props) => (props.user ? '#ffffff' : '#75cdb1;')};
   border-radius: ${(props) =>
@@ -51,13 +55,15 @@ const Message = styled.div`
   align-self: flex-end;
   position: relative;
   z-index: 5;
-  filter: drop-shadow(5px 5px 2px #bbbbbba9);
+  filter: drop-shadow(3px 3px 2px #bbbbbba9);
 `;
 const Placeholder = styled.div`
   height: 12px;
   filter: none;
-  width: 100%;
+  width:100%;
+  display:flex;
+  justify-content:${(props) => (props.user ? 'flex-end' : 'flex-start')};
+  padding-right:12px;
   position: absolute;
   top: -17px;
-  content: ${(props) => (props.user ? 'YOU' : 'User')};
 `;
