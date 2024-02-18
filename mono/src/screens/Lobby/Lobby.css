@@ -104,6 +104,7 @@
 
 .right_content .meeting_section {
   display: flex;
+  
   margin-top: 20px;
   gap: 20px;
   animation: dropdown 1s;

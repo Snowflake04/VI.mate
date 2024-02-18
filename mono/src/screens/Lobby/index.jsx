@@ -1,16 +1,16 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dotSquare from '../../images/squaredot.png';
-import { TextField } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import styled from 'styled-components'
 import { useStream, getPeer } from '../../context/StreamProvider';
 import './Lobby.css';
 
 const LobbyScreen = () => {
-  const [username, setUsername] = useState('');
+  const nameRef = useRef();
+  const codeRef = useRef();
+
   const [userError, setUserError] = useState(false);
   const [newRoom, setNewRoom] = useState(false);
-  const [roomCode, setRoomCode] = useState('');
   const [roomError, setRoomError] = useState({
     error: false,
     errorMessage: '',
@@ -22,13 +22,15 @@ const LobbyScreen = () => {
   console.log(Peer);
 
   const validateUsername = () => {
-    if (username === '') {
+    let username = nameRef.current.value;
+    if (!username) {
       setUserError(true);
       return false;
     } else return true;
   };
 
   const ValidateRoomCode = () => {
+    let roomCode = codeRef.current.value;
     if (roomCode === '') {
       return setRoomError({
         error: true,
@@ -42,12 +44,12 @@ const LobbyScreen = () => {
   };
 
   const createRoom = useCallback(() => {
-    if (validateUsername()) Peer.emit('createRoom', username);
-  }, [Peer]);
+    if (validateUsername()) Peer.emit('createRoom', nameRef.current.value);
+  },);
 
   const handleJoinButton = () => {
     if (validateUsername() && ValidateRoomCode()) {
-      Peer.emit('joinRoom', username, roomCode);
+      Peer.emit('joinRoom', nameRef.current.value, codeRef.current.value);
     }
   };
 
@@ -94,16 +96,10 @@ const LobbyScreen = () => {
           free
         </div>
         <Room
-          error={userError}
-          label='username'
-          variant='standard'
-          helperText={userError ? 'Username is required' : ''}
-          onChange={(e) => {
-            setUsername(e.target.value);
-            setUserError(false);
-          }}
-          style={{ maxWidth: '250px' }}
+          ref={nameRef}
+          placeholder='Enter username'
         />
+        {userError && <div style={{color:"red", marginTop: "5px"}}> username is required</div>}
         <div className='button_holder'>
           <button type='button' onClick={createRoom}>
             Create Room
@@ -115,13 +111,10 @@ const LobbyScreen = () => {
         {newRoom && (
           <div className='meeting_section'>
             <Room
-              error={roomError.error}
-              helperText={roomError.errorMessage}
-              size='small'
-              onChange={(e) => setRoomCode(e.target.value)}
-              label='Room Code'
-              variant='standard'
+              ref={codeRef}
+              placeholder='Room code'
             />
+             {roomError.error && <div style={{color:"red", marginTop: "5px"}}>{roomError.errorMessage} </div>}
             <button type='button' onClick={handleJoinButton}>
               enter
             </button>
@@ -132,24 +125,16 @@ const LobbyScreen = () => {
   );
 };
 
-const Room = styled(TextField)({
-  '& label.Mui-focused': {
-    color: '#A0AAB4',
-  },
-  '& .MuiInput-underline:after': {
-    borderBottomColor: '#B2BAC2',
-  },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: '#E0E3E7',
-    },
-    '&:hover fieldset': {
-      borderColor: '#B2BAC2',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#6F7E8C',
-    },
-  },
-});
+const Room = styled.input`
+background:transparent;
+border:none;
+padding:8px;
+border-bottom:2px solid  #686869;
+outline:none;
+//change placeholder color
+&::placeholder{
+color:#dddcdc;
+}
+`;
 
 export default LobbyScreen;
