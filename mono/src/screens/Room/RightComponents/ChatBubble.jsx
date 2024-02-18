@@ -7,7 +7,7 @@ const UserBubble = ({ message }) => {
 
   const getUser = useCallback(() => {
     return userMap[message.user] || 'user';
-  });
+  },[userMap]);
 
   return (
     <Container user={message.self ? true : null}>

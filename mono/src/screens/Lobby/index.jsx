@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dotSquare from '../../images/squaredot.png';
 import { TextField } from '@mui/material';
@@ -15,11 +15,11 @@ const LobbyScreen = () => {
     error: false,
     errorMessage: '',
   });
-  
+
   const { setMessages, setUserMap } = useStream();
   const navigate = useNavigate();
   const Peer = getPeer();
-  console.log( Peer);
+  console.log(Peer);
 
   const validateUsername = () => {
     if (username === '') {
@@ -41,9 +41,9 @@ const LobbyScreen = () => {
     } else return true;
   };
 
-  const createRoom = useCallback((e) => {
+  const createRoom = useCallback(() => {
     if (validateUsername()) Peer.emit('createRoom', username);
-  });
+  }, [Peer]);
 
   const handleJoinButton = () => {
     if (validateUsername() && ValidateRoomCode()) {
@@ -75,7 +75,7 @@ const LobbyScreen = () => {
       Peer.off('newRoomCreated', joinNewRoom);
       Peer.off('roomJoined', joinRoom);
     };
-  }, [Peer]);
+  }, [Peer, joinNewRoom, joinRoom]);
 
   return (
     <div className='lobby'>
@@ -108,7 +108,7 @@ const LobbyScreen = () => {
           <button type='button' onClick={createRoom}>
             Create Room
           </button>
-          <button type='button' onClick={(e) => setNewRoom(true)}>
+          <button type='button' onClick={() => setNewRoom(true)}>
             Join Room
           </button>
         </div>

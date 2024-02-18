@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import ReactPlayer from 'react-player';
 import { useSocket, getPeer } from '../context/SocketProvider';
 
