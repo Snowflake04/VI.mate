@@ -1,10 +1,13 @@
-import styled from 'styled-components';
-import { getPeer } from '../../../context/StreamProvider';
+import styled, { keyframes } from 'styled-components';
+import { getPeer, useStream } from '../../../context/StreamProvider';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const BottomNav = () => {
   const Peer = getPeer();
   const navigate = useNavigate();
+  const [newUser, setNewUser] = useState(null);
+  const { setUserMap } = useStream();
 
   const handleLeaveButton = () => {
     Peer.emit('disconnected', Peer.roomId);
@@ -14,12 +17,26 @@ const BottomNav = () => {
     });
   };
 
+  useEffect(() => {
+    Peer.on('newUserJoined', (username, id) => {
+      setUserMap((prev) => ({ ...prev, [id]: username }));
+      setNewUser(username);
+
+      setTimeout(() => {
+        setNewUser(null);
+      }, 3000);
+
+      console.log('New user joined');
+    });
+  }, []);
+
   return (
     <Container>
       <RoomDetails>
         <Name>Room for doing something...</Name>
         <Code>{Peer.roomId}</Code>
       </RoomDetails>
+      {newUser && <UserToast>{`${newUser} joined`}</UserToast>}
       <RoomControls>
         <Control>
           <svg viewBox='0 0 384 512'>
@@ -51,6 +68,34 @@ const BottomNav = () => {
 };
 
 export default BottomNav;
+
+const reveal = keyframes`
+    0% {
+        visibility: hidden;
+    }
+
+    25% {
+        visibility: hidden;
+    }
+
+    50% {
+        visibility: hidden;
+    }
+
+    75% {
+        visibility: visible;
+
+        /* transform: scale(2); */
+        border-radius: 100%;
+        width: 24px;
+        height: 24px;
+        color: transparent;
+    }
+
+    100% {
+        visibility: visible;
+    }
+`;
 
 const Container = styled.div`
   display: flex;
@@ -99,4 +144,14 @@ const LeaveButton = styled.button`
     height: 18px;
     fill: white;
   }
+`;
+const UserToast = styled.div`
+  display: grid;
+  place-items: center;
+  border: 1px solid #6dabd2;
+  border-radius: 100px;
+  background-color: #6dabd2;
+  color: #ffffff;
+  padding: 15px;
+  animation: ${reveal} 1.2s;
 `;
