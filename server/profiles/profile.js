@@ -1,6 +1,4 @@
 import { registerFont, createCanvas } from 'canvas';
-import { writeFileSync } from 'fs';
-
 const getProfile = (name) => {
   // registerFont('src/fonts/Charmonman.ttf', { family: 'Charmonman Bold' });
   const pallet = [
@@ -30,7 +28,6 @@ const getProfile = (name) => {
   ctx.fillText(name, x, y);
 
   const buffer = canvas.toBuffer();
-  console.log(buffer);
 };
 
 getProfile('NS');

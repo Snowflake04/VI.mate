@@ -1,11 +1,19 @@
 import styled from 'styled-components';
+import Profile from '../../../images/profile';
 
-const Participant = ({id, username}) => {
+const Participant = ({ id, username }) => {
+  let rgx = new RegExp(/(\p{L}{1})\p{L}+/, 'gu');
+
+  let initials = [...username.matchAll(rgx)] || [];
+  initials = (
+    (initials.shift()?.[1] || '') + (initials.pop()?.[1] || '')
+  ).toUpperCase();
+
   return (
     <Container>
       <Details>
         <Avatar>
-          <img src='https://api.multiavatar.com/rand.png?apikey=paIAT14vy2m9Bs' />
+          <Profile name={initials} />
         </Avatar>
         <Name> {username}</Name>
       </Details>
@@ -22,8 +30,9 @@ export default Participant;
 
 const Container = styled.div`
   height: 50px;
-  padding-left: 12px;
-  width: 100%;
+  margin: 0 4px;
+  padding-left: 16px;
+  max-width: 100%;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -35,15 +44,13 @@ const Container = styled.div`
 `;
 
 const Avatar = styled.div`
+  height: 35px;
   aspect-ratio: 1;
-  max-height: 40px;
+  overflow: hidden;
   display: flex;
   border-radius: 50%;
-  img {
-    object-fit: contain;
-    height: 100%;
-    width: 100%;
-  }
+  filter: drop-shadow(0 4px 4px #b1b0b0);
+
 `;
 
 const Details = styled.div`
@@ -51,14 +58,15 @@ const Details = styled.div`
   align-items: center;
 `;
 const Name = styled.div`
-  font-size: 1em;
+padding-left:8px;
+  font-size: 12pt;
   margin-left: 8px;
 `;
 
 const Controls = styled.div`
   height: 25px;
   aspect-ratio: 1;
-  margin-right: 8px;
+  margin-right: 10%;
   border-radius: 50%;
   display: grid;
   place-items: center;
