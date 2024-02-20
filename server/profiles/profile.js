@@ -1,7 +1,8 @@
-const { registerFont, createCanvas } = require('canvas');
+import { registerFont, createCanvas } from 'canvas';
+import { writeFileSync } from 'fs';
 
 const getProfile = (name) => {
-  registerFont('src/fonts/Charmonman.ttf', { family: 'Charmonman Bold' });
+  // registerFont('src/fonts/Charmonman.ttf', { family: 'Charmonman Bold' });
   const pallet = [
     '#D7EDEB',
     '#EBF8F5',
@@ -16,7 +17,7 @@ const getProfile = (name) => {
   ctx.fillStyle = pallet[Math.round(Math.random() * pallet.length)];
   ctx.fillRect(0, 0, 128, 128);
 
-  ctx.font = '40pt Charmonman Bold';
+  ctx.font = '40pt Sans';
   let width = ctx.measureText(name).width;
 
   // Center the text horizontally and vertically within the image.
@@ -29,6 +30,7 @@ const getProfile = (name) => {
   ctx.fillText(name, x, y);
 
   const buffer = canvas.toBuffer();
-  return buffer;
+  console.log(buffer);
 };
-module.exports = getProfile
+
+getProfile('NS');
