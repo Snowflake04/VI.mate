@@ -11,11 +11,6 @@ const Splash = () => {
 
   console.log('room re-render');
   useEffect(() => {
-    Peer.on('newUserJoined', (username, id) => {
-      setUserMap((prev) => ({ ...prev, [id]: username }));
-      //TODO: create a splash for displaying  new user joined message
-      console.log('New user joined');
-    });
     Peer.on('incommingCall', handleCall);
     Peer.on('RTCOffer', handleOffer);
     Peer.on('RTCAnswer', handleAnswer);

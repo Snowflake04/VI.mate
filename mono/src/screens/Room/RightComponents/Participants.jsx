@@ -61,9 +61,9 @@ const Counter = styled.div`
 `;
 
 const ParticipantsHolder = styled.div`
-  margin-top: 15px;
+  margin-top: 6px;
   display: grid;
-  gap: 8px;
+  gap: 4px;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;

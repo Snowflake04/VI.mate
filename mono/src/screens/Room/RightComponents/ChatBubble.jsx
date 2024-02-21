@@ -29,7 +29,7 @@ const Container = styled.div`
   padding: 0 12px;
   display: flex;
   flex-direction: ${(props) => (props.user ? 'row-reverse' : 'row')};
-  width: 100%;
+  max-width: 100%;
 `;
 const Avatar = styled.div`
   height: 40px;
