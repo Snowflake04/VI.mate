@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 
 const Profile = ({ name }) => {
   const canv = useRef(null);
+  
   const pallet = [
     '#D7EDEB',
     '#EBF8F5',
@@ -27,7 +28,7 @@ const Profile = ({ name }) => {
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 3;
     ctx.fillText(name, x, y);
-  });
+  },[name]);
   return <canvas ref={canv} height={60} width={60} />;
 };
 
