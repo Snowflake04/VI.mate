@@ -79,8 +79,9 @@ export default Splash;
 
 const MainContainer = styled.div`
   display: grid;
-  grid-template-columns: 1.2fr 4fr 1.5fr;
-  height: 100dvh;
+  grid-template-columns: 1fr 4fr 1.4fr;
+  height:100dvh;
+  max-height: 100dvh;
   background-color: #e0dfdf;
   padding: 12px;
 `;

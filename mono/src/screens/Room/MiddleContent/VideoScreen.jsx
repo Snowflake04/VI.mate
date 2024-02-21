@@ -1,10 +1,11 @@
 import styled from 'styled-components';
-import ReactPlayer from 'react-player';
-import { useEffect, useCallback } from 'react';
+import VideoStream from './videoStream';
+import { useEffect, useCallback, useRef } from 'react';
 import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = () => {
   const Peer = getPeer();
+  const videoRef = useRef();
   const { remoteStream, setRemoteStream } = useStream();
 
   console.log('video screen re-render');
@@ -12,23 +13,23 @@ const VideoScreen = () => {
   const handleStreamUpdate = useCallback(() => {
     console.log('updating...');
     setRemoteStream({ ...Peer.remoteStream });
-  });
+  }, [Peer]);
 
   useEffect(() => {
     Peer.on('remoteStreamUpdate', handleStreamUpdate);
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
-  }, [handleStreamUpdate]);
+  }, [Peer]);
 
   return (
     <Container>
       <LocalStream>
-        <Player url={Peer.localStream} playing width={'100%'} muted />
+        <VideoStream stream={Peer.localStream} />
       </LocalStream>
       <RemoteStream>
         {remoteStream &&
           Object.values(remoteStream).map((stream) => (
             <RemoteStreamContainer key={stream.id}>
-              <Player playing width={'100%'} url={stream} />
+              <VideoStream stream={stream} />
             </RemoteStreamContainer>
           ))}
       </RemoteStream>
@@ -48,17 +49,13 @@ const Container = styled.div`
   justify-content: space-between;
   align-content: space-between;
 `;
+
 const LocalStream = styled.div`
+  aspect-ratio: 16/9;
   height: 0;
-  padding-bottom: 56.25%;
+  padding-bottom: 56%;
   border-radius: 15px;
-  margin-bottom: 5px;
-  max-height: 55%;
   overflow: hidden;
-  img {
-    width: 100%;
-    border-radius: 15px;
-  }
 `;
 
 const RemoteStream = styled.div`
@@ -83,12 +80,4 @@ const RemoteStreamContainer = styled.div`
   img {
     height: 100%;
   }
-`;
-
-const Player = styled(ReactPlayer)`
-  transform: scaleX(-1);
-  border-radius: 15px;
-  background-color: #4b4b4b;
-  aspect-ratio: 16/9;
-  height: auto !important;
 `;
