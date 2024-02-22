@@ -1,6 +1,7 @@
 import styled, { keyframes } from 'styled-components';
 import { getPeer, useStream } from '../../../context/StreamProvider';
 import { useNavigate } from 'react-router-dom';
+
 import { useEffect, useState, useCallback } from 'react';
 
 const BottomNav = ({ setLayout }) => {
