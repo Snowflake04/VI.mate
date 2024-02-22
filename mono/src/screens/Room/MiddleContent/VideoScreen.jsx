@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 import VideoStream from './videoStream';
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useStream, getPeer } from '../../../context/StreamProvider';
 
-const VideoScreen = () => {
+const VideoScreen = ({ layout }) => {
   const Peer = getPeer();
-  const videoRef = useRef();
   const { remoteStream, setRemoteStream } = useStream();
 
   console.log('video screen re-render');
@@ -19,20 +18,31 @@ const VideoScreen = () => {
     Peer.on('remoteStreamUpdate', handleStreamUpdate);
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
   }, [Peer]);
-
   return (
-    <Container>
-      <LocalStream>
-        <VideoStream stream={Peer.localStream} />
-      </LocalStream>
-      <RemoteStream>
-        {remoteStream &&
-          Object.values(remoteStream).map((stream) => (
-            <RemoteStreamContainer key={stream.id}>
+    <Container layout={layout}>
+      {layout ? (
+        <>
+          <VideoStream stream={Peer.localStream} />
+          {remoteStream &&
+            Object.values(remoteStream).map((stream) => (
               <VideoStream stream={stream} />
-            </RemoteStreamContainer>
-          ))}
-      </RemoteStream>
+            ))}
+        </>
+      ) : (
+        <>
+          <LocalStream>
+            <VideoStream stream={Peer.localStream} />
+          </LocalStream>
+          <RemoteStream>
+            {remoteStream &&
+              Object.values(remoteStream).map((stream) => (
+                <RemoteStreamContainer key={stream.id}>
+                  <VideoStream stream={stream} />
+                </RemoteStreamContainer>
+              ))}
+          </RemoteStream>
+        </>
+      )}
     </Container>
   );
 };
@@ -40,8 +50,10 @@ const VideoScreen = () => {
 export default VideoScreen;
 
 const Container = styled.div`
-  display: flex;
+  display: ${(props) => (props.layout ? 'grid' : 'flex')};
   flex-direction: column;
+  grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
+  gap:8px;
   border-radius: 15px;
   margin: 5px 10px;
   margin-top: 0;
