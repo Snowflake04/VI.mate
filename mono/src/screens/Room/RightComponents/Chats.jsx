@@ -61,7 +61,7 @@ export default Chats;
 
 const Container = styled.div`
   background: white;
-  border-radius: 15px;
+  border-radius: 10px;
   margin-top: 5px;
   display: flex;
   flex-direction: column;

@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 import VideoScreen from './VideoScreen';
 import BottomNav from './BottomNav';
+import { useState } from 'react';
 
 const MiddleContent = () => {
+  const [expandedLayout, setExpandedLayout] = useState(false);
+
   return (
     <Container>
-      <VideoScreen />
-      <BottomNav />
+      <VideoScreen layout ={expandedLayout}/>
+      <BottomNav setLayout={setExpandedLayout} />
     </Container>
   );
 };
@@ -18,5 +21,5 @@ const Container = styled.div`
   grid-template: 8.5fr 1.2fr /1fr;
   border-radius: 15px;
   margin: 0 5px;
-  overflow:hidden;
+  overflow: hidden;
 `;

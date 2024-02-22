@@ -4,7 +4,7 @@ import { useStream } from '../../../context/StreamProvider';
 
 const Participants = () => {
   const { userMap } = useStream();
-  console.log(userMap)
+  console.log(userMap);
   return (
     <Container>
       <Header>
@@ -12,7 +12,7 @@ const Participants = () => {
         <Counter>{Object.keys(userMap).length}</Counter>
       </Header>
       <ParticipantsHolder>
-      {Object.entries(userMap).map(([key, value]) => (
+        {Object.entries(userMap).map(([key, value]) => (
           <Participant id={key} username={value} />
         ))}
       </ParticipantsHolder>
@@ -26,7 +26,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   background: white;
-  border-radius: 15px;
+  border-radius: 10px;
   margin-bottom: 5px;
   overflow: hidden;
 `;

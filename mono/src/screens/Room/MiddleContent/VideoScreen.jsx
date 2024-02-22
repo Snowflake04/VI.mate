@@ -1,9 +1,9 @@
 import styled from 'styled-components';
-import ReactPlayer from 'react-player';
+import VideoStream from './videoStream';
 import { useEffect, useCallback } from 'react';
 import { useStream, getPeer } from '../../../context/StreamProvider';
 
-const VideoScreen = () => {
+const VideoScreen = ({ layout }) => {
   const Peer = getPeer();
   const { remoteStream, setRemoteStream } = useStream();
 
@@ -12,26 +12,37 @@ const VideoScreen = () => {
   const handleStreamUpdate = useCallback(() => {
     console.log('updating...');
     setRemoteStream({ ...Peer.remoteStream });
-  });
+  }, [Peer]);
 
   useEffect(() => {
     Peer.on('remoteStreamUpdate', handleStreamUpdate);
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
-  }, [handleStreamUpdate]);
-
+  }, [Peer]);
   return (
-    <Container>
-      <LocalStream>
-        <Player url={Peer.localStream} playing width={'100%'} muted />
-      </LocalStream>
-      <RemoteStream>
-        {remoteStream &&
-          Object.values(remoteStream).map((stream) => (
-            <RemoteStreamContainer key={stream.id}>
-              <Player playing width={'100%'} url={stream} />
-            </RemoteStreamContainer>
-          ))}
-      </RemoteStream>
+    <Container layout={layout}>
+      {layout ? (
+        <>
+          <VideoStream stream={Peer.localStream} />
+          {remoteStream &&
+            Object.values(remoteStream).map((stream) => (
+              <VideoStream stream={stream} />
+            ))}
+        </>
+      ) : (
+        <>
+          <LocalStream>
+            <VideoStream stream={Peer.localStream} />
+          </LocalStream>
+          <RemoteStream>
+            {remoteStream &&
+              Object.values(remoteStream).map((stream) => (
+                <RemoteStreamContainer key={stream.id}>
+                  <VideoStream stream={stream} />
+                </RemoteStreamContainer>
+              ))}
+          </RemoteStream>
+        </>
+      )}
     </Container>
   );
 };
@@ -39,8 +50,10 @@ const VideoScreen = () => {
 export default VideoScreen;
 
 const Container = styled.div`
-  display: flex;
+  display: ${(props) => (props.layout ? 'grid' : 'flex')};
   flex-direction: column;
+  grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
+  gap:8px;
   border-radius: 15px;
   margin: 5px 10px;
   margin-top: 0;
@@ -48,17 +61,13 @@ const Container = styled.div`
   justify-content: space-between;
   align-content: space-between;
 `;
+
 const LocalStream = styled.div`
+  aspect-ratio: 16/9;
   height: 0;
-  padding-bottom: 56.25%;
+  padding-bottom: 56%;
   border-radius: 15px;
-  margin-bottom: 5px;
-  max-height: 55%;
   overflow: hidden;
-  img {
-    width: 100%;
-    border-radius: 15px;
-  }
 `;
 
 const RemoteStream = styled.div`
@@ -83,12 +92,4 @@ const RemoteStreamContainer = styled.div`
   img {
     height: 100%;
   }
-`;
-
-const Player = styled(ReactPlayer)`
-  transform: scaleX(-1);
-  border-radius: 15px;
-  background-color: #4b4b4b;
-  aspect-ratio: 16/9;
-  height: auto !important;
 `;

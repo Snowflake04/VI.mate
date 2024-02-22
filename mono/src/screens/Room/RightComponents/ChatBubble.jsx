@@ -60,10 +60,11 @@ const Message = styled.div`
 const Placeholder = styled.div`
   height: 12px;
   filter: none;
-  width:100%;
-  display:flex;
-  justify-content:${(props) => (props.user ? 'flex-end' : 'flex-start')};
-  padding-right:12px;
+  /* overflow: hidden; */
+  width: 100%;
+  display: flex;
+  justify-content: ${(props) => (props.user ? 'flex-end' : 'flex-start')};
+  padding-right: 12px;
   position: absolute;
-  top: -17px;
+  top: -18px;
 `;
