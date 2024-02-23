@@ -54,6 +54,7 @@ const Container = styled.div`
   flex-direction: column;
   grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
   gap:8px;
+  width:100%;
   border-radius: 15px;
   margin: 5px 10px;
   margin-top: 0;
