@@ -1,16 +1,103 @@
 import styled, { keyframes } from 'styled-components';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getPeer, useStream } from '../../context/StreamProvider';
+
 const MainScreen = () => {
+  // <-------------------DECLERATIONS--------------->
+  const Peer = getPeer();
+  console.log(Peer);
   const [room, setRoom] = useState(false);
   const [form, setForm] = useState(false);
+  const navigate = useNavigate();
+  const joinUserRef = useRef();
+  const joinCodeRef = useRef();
+  const CreateUserRef = useRef();
+  const description = useRef();
+
+  const { setMessages, setUserMap } = useStream();
+
+  // <----------------------FUNCTIONS-------------------->
 
   const handleJoin = useCallback(() => {
+    setForm(false);
     setRoom((prev) => !prev);
   });
 
   const handleForm = useCallback(() => {
+    setRoom(false);
     setForm((prev) => !prev);
   });
+
+  const handleRoomCreate = useCallback(() => {
+    let err = {};
+    if (CreateUserRef.current.value === '') {
+      CreateUserRef.current.placeholder = 'Username is required';
+      err['user'] = true;
+    }
+
+    if (description.current.value === '') {
+      description.current.placeholder = 'Add a description!';
+      err['des'] = true;
+    }
+
+    if (Object.values(err).every((val) => val === null)) {
+      Peer.emit('createRoom', CreateUserRef.current.value);
+    }
+  });
+
+  const handleJoinRoom = useCallback(() => {
+    const err = {};
+    const regEx = /^[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}$/;
+
+    if (joinUserRef.current.value === '') {
+      joinUserRef.current.placeholder = 'Username is required!';
+      err['user'] = true;
+    }
+    if (joinCodeRef.current.value === '') {
+      joinCodeRef.current.placeholder = 'Please enter Room Code';
+      err['code'] = true;
+    } else if (!regEx.test(joinCodeRef.current.value)) {
+      joinCodeRef.current.value = '';
+      joinCodeRef.current.placeholder = 'Please a Valid Code';
+    }
+
+    if (Object.values(err).every((val) => val === null)) {
+      Peer.emit(
+        'joinRoom',
+        joinUserRef.current.value,
+        joinCodeRef.current.value
+      );
+    }
+  });
+
+  const joinRoom = async (room) => {
+    Peer.roomId = room.roomCode;
+    setUserMap(room.participants);
+    setMessages(room.messages);
+    navigate(`/room/${room.roomCode}`, { replace: true });
+    Peer.emit('createCall', {
+      roomId: Peer.roomId,
+      from: Peer.id,
+    });
+  };
+
+  const joinNewRoom = async (room) => {
+    setUserMap(room.participants);
+    Peer.roomId = room.roomCode;
+    navigate(`/room/${room.roomCode}`, { replace: true });
+  };
+
+  // <-----------------------EFFECTS------------------->
+
+  useEffect(() => {
+    Peer.on('newRoomCreated', joinNewRoom);
+    Peer.on('roomJoined', joinRoom);
+    return () => {
+      Peer.off('newRoomCreated', joinNewRoom);
+      Peer.off('roomJoined', joinRoom);
+    };
+  }, [Peer]);
 
   return (
     <Container>
@@ -26,24 +113,26 @@ const MainScreen = () => {
           <CreateButton onClick={handleForm}>Start a New Meeting</CreateButton>
           <JoinButton onClick={handleJoin}>Join a Meeting</JoinButton>
         </FormHolder>
-        {room && (
-          <CodeContainer>
-            <Label>Room code</Label>
-            <CodeInput maxLength={14} />
-            <EnterButton>Join ⇨</EnterButton>
-          </CodeContainer>
-        )}
       </LeftContainer>
       <RightContainer>
         {form && (
           <RoomForm>
             <Name>Username:</Name>
-            <Field />
+            <Field ref={CreateUserRef} />
             <Name>Room Purpose:</Name>
-            <Field />
-            <Name>Number of Participants:</Name>
-            <Field />
-            <CreateButton>Create</CreateButton>
+            <Field ref={description} />
+            {/* <Name>Number of Participants:</Name>
+            <Field type='number' /> */}
+            <CreateButton onClick={handleRoomCreate}>Create</CreateButton>
+          </RoomForm>
+        )}
+        {room && (
+          <RoomForm>
+            <Name>Username:</Name>
+            <Field ref={joinUserRef} />
+            <Name>Room Code:</Name>
+            <Field ref={joinCodeRef} />
+            <EnterButton onClick={handleJoinRoom}>Join ⇨</EnterButton>
           </RoomForm>
         )}
       </RightContainer>
@@ -52,19 +141,6 @@ const MainScreen = () => {
 };
 
 export default MainScreen;
-
-const Drop = keyframes`
-  0%{
-    transform:translateY(-50px);
-    opacity: 0;
-  }
-  30%{
-    opacity:0.3;
-  }
-  100%{
-    transform:translateX(0)
-  }
-`;
 
 const SwipeRight = keyframes`
   0%{
@@ -113,15 +189,15 @@ const FormHolder = styled.div`
 const CreateButton = styled.button`
   border: none;
   position: relative;
-  background: transparent;
+  background: #ecebeb57;
   padding: 8px 12px;
   border-radius: 12px;
-  border: 2px solid rgba(250, 242, 242, 0.2);
   font-size: 12pt;
   cursor: pointer;
   overflow: hidden;
   z-index: 50;
   transition: 0.2s;
+  box-shadow: 1px 1px 5px #434343;
 
   &::after {
     transition: 0.4s;
@@ -145,30 +221,6 @@ const CreateButton = styled.button`
 
 const JoinButton = styled(CreateButton)``;
 
-const CodeContainer = styled.div`
-  margin-top: 40px;
-  position: relative;
-  animation: ${Drop} 1s;
-`;
-
-const CodeInput = styled.input`
-  position: relative;
-  background: transparent;
-  outline: none;
-  border: none;
-  font-size: 14pt;
-  border-bottom: 2px solid #e6e4e4;
-`;
-
-const Label = styled.label`
-  position: absolute;
-  font-size: 12pt;
-  ${CodeContainer}:focus-within & {
-    top: -20px;
-    font-size: 10pt;
-  }
-`;
-
 const EnterButton = styled(JoinButton)`
   margin-left: 14px;
   padding: 2px 8px;
@@ -186,20 +238,32 @@ const RoomForm = styled.div`
   padding: 20px;
   border-radius: 20px;
   backdrop-filter: blur(20px);
-  animation: ${SwipeRight} 1s;
+  box-shadow: 2px 2px 50px #7e7e7e58;
+  animation-name: ${SwipeRight};
+  animation-duration: 1s;
 
   ${CreateButton} {
     align-self: flex-end;
     margin-top: 16px;
   }
 `;
+
 const Name = styled.label`
   margin: 10px 0;
 `;
+
 const Field = styled.input`
   width: 100%;
   background-color: transparent;
   outline: none;
   border: none;
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+
+  &::placeholder {
+    color: red;
+  }
+
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
 `;

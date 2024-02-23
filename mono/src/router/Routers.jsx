@@ -8,7 +8,7 @@ const Routers = () => {
     <StreamProvider>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<LobbyScreen />} />
+          <Route path='/' exact element={<LobbyScreen />} />
           <Route path='/room/:roomId' element={<RoomPage />} />
         </Routes>
       </BrowserRouter>
