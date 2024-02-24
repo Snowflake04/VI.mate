@@ -5,16 +5,21 @@ import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = ({ layout }) => {
   const Peer = getPeer();
-  const { remoteStream, setRemoteStream } = useStream();
+  const { remoteStream, setRemoteStream, localStream } = useStream();
+
+  // <--------Effects--------->
+  useEffect(() => {
+    Peer.on('remoteStreamUpdate', handleStreamUpdate);
+    return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
+  }, [Peer]);
+
+
+  // <----------Functions--------->
 
   const handleStreamUpdate = useCallback(() => {
     setRemoteStream({ ...Peer.remoteStream });
   }, [Peer]);
 
-  useEffect(() => {
-    Peer.on('remoteStreamUpdate', handleStreamUpdate);
-    return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
-  }, [Peer]);
   return (
     <Container layout={layout}>
       {layout ? (

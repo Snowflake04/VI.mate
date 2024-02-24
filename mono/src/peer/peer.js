@@ -6,10 +6,10 @@ class Peer extends Socket {
     super(io, nsp, opts);
     this.peerConnections = {};
     this.remoteStream = {};
-    this.rtcPeerConnection = '';
     this.roomId = '';
+    this.roomDetails = {};
     this.localStream = '';
-    this.setLocalStream();
+    this.setLocalStream()
   }
   async setLocalStream() {
     console.log('Local stream set');
@@ -19,7 +19,8 @@ class Peer extends Socket {
         config.mediaConstraints
       );
     } catch (error) {
-      console.error('Could not get user media', error);
+      if (error.toString().startsWith('NotAllowedError'))
+        return alert('Please enable audio and video');
     }
 
     this.localStream = stream;
@@ -152,7 +153,6 @@ class Peer extends Socket {
       console.log('nego needed', event);
 
     this.peerConnections[remotePeerId] = rtcPeerConnection;
-
     await this.createAnswer(rtcPeerConnection, remotePeerId);
   }
 

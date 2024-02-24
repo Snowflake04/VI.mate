@@ -42,7 +42,7 @@ const MainScreen = () => {
     }
 
     if (Object.values(err).every((val) => val === null)) {
-      Peer.emit('createRoom', CreateUserRef.current.value);
+      Peer.emit('createRoom', CreateUserRef.current.value, description.current.value);
     }
   });
 
@@ -59,6 +59,7 @@ const MainScreen = () => {
       err['code'] = true;
     } else if (!regEx.test(joinCodeRef.current.value)) {
       joinCodeRef.current.value = '';
+      err['code'] = true;
       joinCodeRef.current.placeholder = 'Please a Valid Code';
     }
 
@@ -73,6 +74,7 @@ const MainScreen = () => {
 
   const joinRoom = async (room) => {
     Peer.roomId = room.roomCode;
+    Peer.roomDetails = room;
     setUserMap(room.participants);
     setMessages(room.messages);
     navigate(`/room/${room.roomCode}`, { replace: true });
@@ -85,6 +87,7 @@ const MainScreen = () => {
   const joinNewRoom = async (room) => {
     setUserMap(room.participants);
     Peer.roomId = room.roomCode;
+    Peer.roomDetails = room;
     navigate(`/room/${room.roomCode}`, { replace: true });
   };
 

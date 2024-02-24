@@ -5,7 +5,9 @@ const VideoStream = ({ stream, muted }) => {
   const videoRef = useRef();
   console.log('re render');
   useEffect(() => {
-    videoRef.current.srcObject = stream;
+    if (stream instanceof MediaStream) {
+      videoRef.current.srcObject = stream;
+    }
   }, [stream]);
 
   return (

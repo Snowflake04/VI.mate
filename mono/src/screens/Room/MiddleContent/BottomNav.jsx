@@ -12,7 +12,6 @@ const BottomNav = ({ setLayout }) => {
 
   const handleLeaveButton = () => {
     Peer.emit('disconnected', Peer.roomId);
-    Peer.disconnect();
     navigate('/', {
       replace: true,
     });
@@ -26,8 +25,6 @@ const BottomNav = ({ setLayout }) => {
       setTimeout(() => {
         setNewUser(null);
       }, 3000);
-
-      console.log('New user joined');
     });
   }, []);
 
@@ -37,6 +34,11 @@ const BottomNav = ({ setLayout }) => {
   });
 
   const muteVideo = useCallback(() => {
+    if (!Peer.localStream) return Peer.setLocalStream();
+    
+
+    console.log(Peer.localStream);
+
     let videoTrack = Peer.localStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
   });
@@ -49,14 +51,14 @@ const BottomNav = ({ setLayout }) => {
     navigator.clipboard.writeText(Peer.roomId);
   });
 
-  const handleScreenShare = useCallback(()=>{
-    Peer.handleScreenShare()
-  })
+  const handleScreenShare = useCallback(() => {
+    Peer.handleScreenShare();
+  });
 
   return (
     <Container>
       <RoomDetails>
-        <Name>Room for doing something...</Name>
+        <Name>{Peer.roomDetails.name}.</Name>
         <Code>
           {Peer.roomId}
           <svg
@@ -154,7 +156,7 @@ const Code = styled.div`
     height: 14px;
     fill: gray;
     margin-left: 16px;
-    margin-top:2px;
+    margin-top: 2px;
     cursor: pointer;
     &:active {
       transition: 0.2s;

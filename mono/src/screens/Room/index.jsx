@@ -7,9 +7,10 @@ import { useStream, getPeer } from '../../context/StreamProvider';
 
 const Splash = () => {
   const Peer = getPeer();
-  const { setUserMap } = useStream();
+  const { setUserMap, setLocalStream } = useStream();
 
-  //Evevnts useEffect
+  // <--------------Events---------->
+
   console.log('room re-render');
   useEffect(() => {
     Peer.on('incommingCall', handleCall);
@@ -25,6 +26,17 @@ const Splash = () => {
       Peer.off('userDisconnected', removeUser);
     };
   }, [Peer]);
+
+  // <----------Effects------------>
+
+  // useEffect(() => {
+  //   (async () => {
+  //     await Peer.setLocalStream();
+  //     setLocalStream(Peer.localStream);
+  //   })();
+  // }, [Peer.localStream]);
+
+  // <----------- Functions----------->
 
   const handleCall = useCallback(
     async (offer) => {
@@ -64,7 +76,7 @@ const Splash = () => {
 
       Peer.removeRemoteStream(userId);
     },
-    [setUserMap]
+    [Peer]
   );
 
   return (
