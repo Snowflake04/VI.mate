@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPeer, useStream } from '../../context/StreamProvider';
 
 const MainScreen = () => {
+  
   // <-------------------DECLERATIONS--------------->
   const Peer = getPeer();
   console.log(Peer);

@@ -9,7 +9,7 @@ class Peer extends Socket {
     this.roomId = '';
     this.roomDetails = {};
     this.localStream = '';
-    this.setLocalStream()
+    this.setLocalStream();
   }
   async setLocalStream() {
     console.log('Local stream set');
@@ -145,31 +145,49 @@ class Peer extends Socket {
     };
     rtcPeerConnection.oniceconnectionstatechange = (event) =>
       this.checkPeerDisconnect(event, remotePeerId);
-
     rtcPeerConnection.onicecandidate = (event) =>
       this.sendIceCandidate(event, remotePeerId);
-
     rtcPeerConnection.onnegotiationneeded = (event) =>
       console.log('nego needed', event);
-
     this.peerConnections[remotePeerId] = rtcPeerConnection;
     await this.createAnswer(rtcPeerConnection, remotePeerId);
   }
 
   async handleScreenShare() {
     const stream = await navigator.mediaDevices.getDisplayMedia();
+    this.handleSourceChange(stream);
+
+    stream.getVideoTracks()[0].onended = async () => {
+      console.log("ended")
+      try {
+        const videoStream = await navigator.mediaDevices.getUserMedia(
+          config.mediaConstraints
+        );
+        this.handleSourceChange(videoStream);
+      } catch (error) {
+        console.log(error)
+        if (error.toString().startsWith('NotAllowedError'))
+          return alert('Please enable audio and video');
+      }
+    };
+  }
+
+  handleSourceChange(source) {
     this.localStream.getTracks().forEach((track) => {
       this.localStream.removeTrack(track);
       track.stop();
     });
-    stream.getTracks().forEach((track) => {
+    source.getTracks().forEach((track) => {
       this.localStream.addTrack(track);
     });
-
     for (let Peer in this.peerConnections) {
       this.peerConnections[Peer].getSenders().forEach((sender) => {
-        if (sender.track.kind === 'video') {
-          sender.replaceTrack(stream.getVideoTracks()[0]);
+        console.log(sender);
+        if (sender.track?.kind === 'video') {
+          sender.replaceTrack(source.getVideoTracks()[0]);
+        }
+        if (sender.track?.kind === 'audio') {
+          sender.replaceTrack(source.getAudioTracks()[0]);
         }
       });
     }
@@ -192,7 +210,6 @@ class Peer extends Socket {
     console.log(
       `Socket event callback: webrtc_ice_candidate. RECEIVED from ${senderPeerId}`
     );
-
     // ICE candidate configuration.
     let candidate = new RTCIceCandidate({
       sdpMLineIndex: offer.label,

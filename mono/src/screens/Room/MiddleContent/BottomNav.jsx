@@ -1,14 +1,23 @@
 import styled, { keyframes } from 'styled-components';
 import { getPeer, useStream } from '../../../context/StreamProvider';
 import { useNavigate } from 'react-router-dom';
-
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 const BottomNav = ({ setLayout }) => {
   const Peer = getPeer();
   const navigate = useNavigate();
   const [newUser, setNewUser] = useState(null);
   const { setUserMap } = useStream();
+  const muteRef = useRef();
+  const videoRef = useRef();
+
+  let audioTrack = Peer.localStream.getAudioTracks()[0];
+  let videoTrack = Peer.localStream.getVideoTracks()[0];
+
+  const type = {
+    true: '#8b8a8a',
+    false: 'red',
+  };
 
   const handleLeaveButton = () => {
     Peer.emit('disconnected', Peer.roomId);
@@ -17,30 +26,44 @@ const BottomNav = ({ setLayout }) => {
     });
   };
 
+  // <--------Events---------->
   useEffect(() => {
-    Peer.on('newUserJoined', (username, id) => {
-      setUserMap((prev) => ({ ...prev, [id]: username }));
-      setNewUser(username);
+    Peer.on('newUserJoined', handleUserJoin);
 
-      setTimeout(() => {
-        setNewUser(null);
-      }, 3000);
-    });
+    return () => {
+      Peer.off('newUserJoined', handleUserJoin);
+    };
+  }, [Peer]);
+
+  // <------Loader--------->
+  useEffect(() => {
+    muteRef.current.style.fill = type[audioTrack.enabled];
+    videoRef.current.style.fill = type[videoTrack.enabled];
   }, []);
+
+  const handleUserJoin = useCallback((username, id) => {
+    setUserMap((prev) => ({ ...prev, [id]: username }));
+    setNewUser(username);
+
+    setTimeout(() => {
+      setNewUser(null);
+    }, 3000);
+  });
 
   const muteAudio = useCallback(() => {
     let audioTrack = Peer.localStream.getAudioTracks()[0];
     audioTrack.enabled = !audioTrack.enabled;
+    muteRef.current.style.fill = type[audioTrack.enabled];
   });
 
   const muteVideo = useCallback(() => {
     if (!Peer.localStream) return Peer.setLocalStream();
-    
 
     console.log(Peer.localStream);
 
     let videoTrack = Peer.localStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
+    videoRef.current.style.fill = type[videoTrack.enabled];
   });
 
   const changeLayout = useCallback(() => {
@@ -79,12 +102,12 @@ const BottomNav = ({ setLayout }) => {
         </Control>
 
         <Control onClick={muteAudio}>
-          <svg viewBox='0 0 384 512'>
+          <svg ref={muteRef} viewBox='0 0 384 512'>
             <path d='M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z' />
           </svg>
         </Control>
         <Control onClick={muteVideo}>
-          <svg viewBox='0 0 576 512'>
+          <svg ref={videoRef} viewBox='0 0 576 512'>
             <path d='M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V320 192 174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z' />
           </svg>
         </Control>

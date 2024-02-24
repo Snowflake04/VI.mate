@@ -8,7 +8,7 @@ const MiddleContent = () => {
 
   return (
     <Container>
-      <VideoScreen layout ={expandedLayout}/>
+      <VideoScreen layout={expandedLayout} />
       <BottomNav setLayout={setExpandedLayout} />
     </Container>
   );
