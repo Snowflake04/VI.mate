@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const Navbar = () => {
   return (
     <Container>
-      <Logo>MONO</Logo>
+      <Logo>VI.mate</Logo>
     </Container>
   );
 };
@@ -15,17 +15,15 @@ const Container = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
-  padding: 30px 6%;
+  padding:32px 3%;
 `;
 
 const Logo = styled.div`
   font-weight: bold;
   height: 32px;
-  filter:drop-shadow(5 0 3px rgba(237, 241, 241, 0.4));
-  display: grid;
-  place-items: center;
-  font-size: 1.8rem;
-  background: linear-gradient(0.25turn, #e66465, #4b52a4);
+  filter:drop-shadow(0px 0px 1px #3535355f);
+  font-size: 24pt;
+  background: linear-gradient(0.25turn, #ff076a77 10% , #044efb);
   background-clip: text;
   -webkit-text-fill-color: transparent;
 `;

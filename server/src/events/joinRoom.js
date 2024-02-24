@@ -1,4 +1,5 @@
 module.exports = ({ server, socket }, userName, roomCode) => {
+  
   const room = server.rooms.get(roomCode);
   room.participants[socket.id] = userName;
   socket.join(roomCode);

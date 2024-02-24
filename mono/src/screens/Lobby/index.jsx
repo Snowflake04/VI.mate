@@ -31,7 +31,7 @@ const Container = styled.div`
   flex-direction: column;
   height: 100dvh;
   width: 100dvw;
-  background: linear-gradient(-45deg, #efd5cd, #8ad4eb, #c2f4ed, #8295c2);
+  background: linear-gradient(-45deg, #e8b7a8, #77b7ca, #8bf2e4, #8295c2);
   background-size: 400% 400%;
   animation: ${gradient} 15s ease infinite;
 `;

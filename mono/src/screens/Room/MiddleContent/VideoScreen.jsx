@@ -7,10 +7,7 @@ const VideoScreen = ({ layout }) => {
   const Peer = getPeer();
   const { remoteStream, setRemoteStream } = useStream();
 
-  console.log('video screen re-render');
-
   const handleStreamUpdate = useCallback(() => {
-    console.log('updating...');
     setRemoteStream({ ...Peer.remoteStream });
   }, [Peer]);
 
@@ -22,7 +19,7 @@ const VideoScreen = ({ layout }) => {
     <Container layout={layout}>
       {layout ? (
         <>
-          <VideoStream stream={Peer.localStream} />
+          <VideoStream muted stream={Peer.localStream} />
           {remoteStream &&
             Object.values(remoteStream).map((stream) => (
               <VideoStream stream={stream} />
@@ -31,7 +28,7 @@ const VideoScreen = ({ layout }) => {
       ) : (
         <>
           <LocalStream>
-            <VideoStream stream={Peer.localStream} />
+            <VideoStream muted stream={Peer.localStream} />
           </LocalStream>
           <RemoteStream>
             {remoteStream &&
@@ -53,8 +50,7 @@ const Container = styled.div`
   display: ${(props) => (props.layout ? 'grid' : 'flex')};
   flex-direction: column;
   grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
-  gap:8px;
-  width:100%;
+  gap: 8px;
   border-radius: 15px;
   margin: 5px 10px;
   margin-top: 0;
@@ -66,6 +62,7 @@ const Container = styled.div`
 const LocalStream = styled.div`
   aspect-ratio: 16/9;
   height: 0;
+  width: 100%;
   padding-bottom: 56%;
   border-radius: 15px;
   overflow: hidden;

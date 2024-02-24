@@ -49,6 +49,10 @@ const BottomNav = ({ setLayout }) => {
     navigator.clipboard.writeText(Peer.roomId);
   });
 
+  const handleScreenShare = useCallback(()=>{
+    Peer.handleScreenShare()
+  })
+
   return (
     <Container>
       <RoomDetails>
@@ -66,7 +70,7 @@ const BottomNav = ({ setLayout }) => {
       </RoomDetails>
       {newUser && <UserToast>{`${newUser} joined`}</UserToast>}
       <RoomControls>
-        <Control onClick={changeLayout}>
+        <Control onClick={handleScreenShare}>
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
             <path d='M447.8 64H64c-23.6 0-42.7 19.1-42.7 42.7v63.9H64v-63.9h383.8v298.6H298.6V448H448c23.6 0 42.7-19.1 42.7-42.7V106.7C490.7 83.1 471.4 64 447.8 64zM21.3 383.6L21.3 383.6l0 63.9h63.9C85.2 412.2 56.6 383.6 21.3 383.6L21.3 383.6zM21.3 298.6V341c58.9 0 106.6 48.1 106.6 107h42.7C170.7 365.6 103.7 298.7 21.3 298.6zM213.4 448h42.7c-.5-129.5-105.3-234.3-234.8-234.6l0 42.4C127.3 255.6 213.3 342 213.4 448z' />
           </svg>
@@ -82,7 +86,7 @@ const BottomNav = ({ setLayout }) => {
             <path d='M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V320 192 174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z' />
           </svg>
         </Control>
-        <Control>
+        <Control onClick={changeLayout}>
           <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
             <path d='M0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zm64 32v64c0 17.7 14.3 32 32 32H416c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32H96c-17.7 0-32 14.3-32 32zM80 320c-13.3 0-24 10.7-24 24s10.7 24 24 24h56c13.3 0 24-10.7 24-24s-10.7-24-24-24H80zm136 0c-13.3 0-24 10.7-24 24s10.7 24 24 24h48c13.3 0 24-10.7 24-24s-10.7-24-24-24H216z' />
           </svg>
