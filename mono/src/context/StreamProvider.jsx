@@ -1,8 +1,15 @@
 import { createContext, useContext, useState } from 'react';
 import { getPeer as Peer } from '../peer';
+import { AsyncQueue } from '@snowflake04/async-queue';
 
 const StreamContext = createContext(null);
 let peer;
+let queue;
+
+export const getQueue = () => {
+  return queue ? queue : new AsyncQueue();
+};
+
 export const getPeer = () => {
   if (peer) {
     return peer;

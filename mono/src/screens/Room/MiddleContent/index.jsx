@@ -3,9 +3,11 @@ import VideoScreen from './VideoScreen';
 import BottomNav from './BottomNav';
 import { memo, useCallback, useEffect, useState, useRef } from 'react';
 import { getPeer } from '../../../context/StreamProvider';
+import { AsyncQueue } from '@snowflake04/async-queue';
 
 const MiddleContent = memo(() => {
-  console.log('video rerendered');
+  console.log('video re rendered');
+  const [queue] = useState(() => new AsyncQueue());
 
   const [expandedLayout, setExpandedLayout] = useState(false);
   const [showRequest, setShowRequest] = useState(null);
@@ -18,15 +20,21 @@ const MiddleContent = memo(() => {
   });
 
   const handleJoinRequest = useCallback(async (user) => {
+    console.log(queue);
+    await queue.wait();
     setShowRequest(user.name);
     socket.current = user;
   });
   const handleApproval = useCallback(() => {
     Peer.emit('requestApproval', socket.current, Peer.roomId);
+    queue.shift();
+    if (!queue.promises[0]) setShowRequest('');
   });
 
   const handleReject = useCallback(() => {
     Peer.emit('requestDecline', socket.current, Peer.roomId);
+    queue.shift();
+    if (!queue.promises[0]) setShowRequest('');
   });
 
   return (

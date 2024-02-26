@@ -9,6 +9,8 @@ const Participant = ({ id, username }) => {
     (initials.shift()?.[1] || '') + (initials.pop()?.[1] || '')
   ).toUpperCase();
 
+
+
   return (
     <Container>
       <Details>
