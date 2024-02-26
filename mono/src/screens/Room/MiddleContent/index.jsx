@@ -41,6 +41,7 @@ const MiddleContent = memo(() => {
         </Request>
       )}
       <VideoScreen layout={expandedLayout} />
+
       <BottomNav setLayout={setExpandedLayout} />
     </Container>
   );

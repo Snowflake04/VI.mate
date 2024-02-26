@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
+
 const VideoStream = ({ stream, muted }) => {
   const videoRef = useRef();
   console.log('re render');
@@ -13,6 +14,7 @@ const VideoStream = ({ stream, muted }) => {
   return (
     <>
       <Player ref={videoRef} muted={muted ? true : false} autoPlay />
+
     </>
   );
 };

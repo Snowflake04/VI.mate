@@ -5,6 +5,7 @@ import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = ({ layout }) => {
   const Peer = getPeer();
+
   const { remoteStream, setRemoteStream, localStream } = useStream();
 
   // <--------Effects--------->
@@ -12,6 +13,7 @@ const VideoScreen = ({ layout }) => {
     Peer.on('remoteStreamUpdate', handleStreamUpdate);
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
   }, [Peer]);
+
 
 
   // <----------Functions--------->
@@ -25,6 +27,7 @@ const VideoScreen = ({ layout }) => {
       {layout ? (
         <>
           <VideoStream muted stream={Peer.localStream} />
+
           {remoteStream &&
             Object.values(remoteStream).map((stream) => (
               <VideoStream stream={stream} />
@@ -34,6 +37,7 @@ const VideoScreen = ({ layout }) => {
         <>
           <LocalStream>
             <VideoStream muted stream={Peer.localStream} />
+
           </LocalStream>
           <RemoteStream>
             {remoteStream &&
