@@ -1,6 +1,6 @@
 const { webcrypto: crypto } = require('crypto');
 
-module.exports = ({ server, socket }, user) => {
+module.exports = ({ server, socket }, user, name, auth) => {
   const GenerateUUID = () => {
     const CharNumSet =
       'useandom26T198340PX75pxJACKVERYMINDBUSHWOLFGQZbfghjklqvwyzrict';
@@ -34,13 +34,15 @@ module.exports = ({ server, socket }, user) => {
   }
 
   const Room = {
+    name: name,
     roomCode: room,
     admin: socket.id,
     adminName: user,
+    requireAuth: auth,
     messages: [],
+    requests: {},
     participants: { [socket.id]: user },
   };
-
 
   server.rooms.set(room, Room);
 

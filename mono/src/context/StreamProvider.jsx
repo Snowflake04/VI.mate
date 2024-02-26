@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import {getPeer as Peer} from '../peer';
+import { getPeer as Peer } from '../peer';
 
 const StreamContext = createContext(null);
 let peer;
@@ -7,7 +7,7 @@ export const getPeer = () => {
   if (peer) {
     return peer;
   } else {
-    peer = Peer('https://server-ipb4.onrender.com');
+    peer = Peer('http://localhost:8000');
     return peer;
   }
 };

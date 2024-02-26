@@ -5,24 +5,29 @@ import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = ({ layout }) => {
   const Peer = getPeer();
-  const { remoteStream, setRemoteStream } = useStream();
 
-  console.log('video screen re-render');
+  const { remoteStream, setRemoteStream, localStream } = useStream();
 
-  const handleStreamUpdate = useCallback(() => {
-    console.log('updating...');
-    setRemoteStream({ ...Peer.remoteStream });
-  }, [Peer]);
-
+  // <--------Effects--------->
   useEffect(() => {
     Peer.on('remoteStreamUpdate', handleStreamUpdate);
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
   }, [Peer]);
+
+
+
+  // <----------Functions--------->
+
+  const handleStreamUpdate = useCallback(() => {
+    setRemoteStream({ ...Peer.remoteStream });
+  }, [Peer]);
+
   return (
     <Container layout={layout}>
       {layout ? (
         <>
-          <VideoStream stream={Peer.localStream} />
+          <VideoStream muted stream={Peer.localStream} />
+
           {remoteStream &&
             Object.values(remoteStream).map((stream) => (
               <VideoStream stream={stream} />
@@ -31,7 +36,8 @@ const VideoScreen = ({ layout }) => {
       ) : (
         <>
           <LocalStream>
-            <VideoStream stream={Peer.localStream} />
+            <VideoStream muted stream={Peer.localStream} />
+
           </LocalStream>
           <RemoteStream>
             {remoteStream &&
@@ -53,7 +59,7 @@ const Container = styled.div`
   display: ${(props) => (props.layout ? 'grid' : 'flex')};
   flex-direction: column;
   grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
-  gap:8px;
+  gap: 8px;
   border-radius: 15px;
   margin: 5px 10px;
   margin-top: 0;
@@ -65,6 +71,7 @@ const Container = styled.div`
 const LocalStream = styled.div`
   aspect-ratio: 16/9;
   height: 0;
+  width: 100%;
   padding-bottom: 56%;
   border-radius: 15px;
   overflow: hidden;

@@ -4,13 +4,14 @@ import MiddleContent from './MiddleContent';
 import RightComponent from './RightComponents';
 import { useEffect, useCallback } from 'react';
 import { useStream, getPeer } from '../../context/StreamProvider';
+import { useNavigate } from 'react-router-dom';
 
 const Splash = () => {
   const Peer = getPeer();
-  const { setUserMap } = useStream();
-
-  //Evevnts useEffect
-  console.log('room re-render');
+  const { setUserMap, setLocalStream } = useStream();
+  const navigate = useNavigate();
+  // <--------------Events---------->
+  console.log('room re-render', Peer.roomId );
   useEffect(() => {
     Peer.on('incommingCall', handleCall);
     Peer.on('RTCOffer', handleOffer);
@@ -25,6 +26,21 @@ const Splash = () => {
       Peer.off('userDisconnected', removeUser);
     };
   }, [Peer]);
+
+  // <----------Effects------------>
+
+
+  useEffect(() => {
+  if (Peer.roomId === '') navigate(`/`, { replace: true });
+    
+    // (async () => {
+    //   await Peer.setLocalStream();
+    //   setLocalStream(Peer.localStream);
+    // })();
+  }, []);
+
+
+  // <----------- Functions----------->
 
   const handleCall = useCallback(
     async (offer) => {
@@ -64,7 +80,7 @@ const Splash = () => {
 
       Peer.removeRemoteStream(userId);
     },
-    [setUserMap]
+    [Peer]
   );
 
   return (

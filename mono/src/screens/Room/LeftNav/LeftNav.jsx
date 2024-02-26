@@ -6,7 +6,7 @@ const LeftNav = () => {
       <Container>
         <Name>Mono</Name>
         <Nav>
-          <NavItem active>Homepage</NavItem>
+          <NavItem active={true}>Homepage</NavItem>
           <NavItem>Schedule</NavItem>
           <NavItem>Teams</NavItem>
           <NavItem>Chats</NavItem>
