@@ -11,8 +11,15 @@ const BottomNav = ({ setLayout }) => {
   const muteRef = useRef();
   const videoRef = useRef();
 
-  let audioTrack = Peer.localStream.getAudioTracks()[0];
-  let videoTrack = Peer.localStream.getVideoTracks()[0];
+  let audioTrack;
+  let videoTrack;
+
+  try {
+    audioTrack = Peer.localStream.getAudioTracks()[0];
+    videoTrack = Peer.localStream.getVideoTracks()[0];
+  } catch (er) {
+    console.log(er);
+  }
 
   const type = {
     true: '#8b8a8a',
@@ -44,7 +51,6 @@ const BottomNav = ({ setLayout }) => {
   const handleUserJoin = useCallback((username, id) => {
     setUserMap((prev) => ({ ...prev, [id]: username }));
     setNewUser(username);
-
     setTimeout(() => {
       setNewUser(null);
     }, 3000);
@@ -58,9 +64,6 @@ const BottomNav = ({ setLayout }) => {
 
   const muteVideo = useCallback(() => {
     if (!Peer.localStream) return Peer.setLocalStream();
-
-    console.log(Peer.localStream);
-
     let videoTrack = Peer.localStream.getVideoTracks()[0];
     videoTrack.enabled = !videoTrack.enabled;
     videoRef.current.style.fill = type[videoTrack.enabled];

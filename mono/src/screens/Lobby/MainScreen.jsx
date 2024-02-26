@@ -4,17 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { getPeer, useStream } from '../../context/StreamProvider';
 
 const MainScreen = () => {
-  
   // <-------------------DECLERATIONS--------------->
   const Peer = getPeer();
   console.log(Peer);
   const [room, setRoom] = useState(false);
   const [form, setForm] = useState(false);
+  const [wait, setWait] = useState(false);
   const navigate = useNavigate();
   const joinUserRef = useRef();
   const joinCodeRef = useRef();
   const CreateUserRef = useRef();
   const description = useRef();
+  const authRef = useRef();
 
   const { setMessages, setUserMap } = useStream();
 
@@ -43,7 +44,12 @@ const MainScreen = () => {
     }
 
     if (Object.values(err).every((val) => val === null)) {
-      Peer.emit('createRoom', CreateUserRef.current.value, description.current.value);
+      Peer.emit(
+        'createRoom',
+        CreateUserRef.current.value,
+        description.current.value,
+        authRef.current.checked
+      );
     }
   });
 
@@ -92,14 +98,26 @@ const MainScreen = () => {
     navigate(`/room/${room.roomCode}`, { replace: true });
   };
 
+  const handleWait = (room) => {
+    setWait({ name: room, status: 'is Pending...' });
+  };
+
+  const handleReject = (room) => {
+    setWait({ name: room, status: 'is Declined.' });
+  };
+
   // <-----------------------EFFECTS------------------->
 
   useEffect(() => {
     Peer.on('newRoomCreated', joinNewRoom);
     Peer.on('roomJoined', joinRoom);
+    Peer.on('approvalPending', handleWait);
+    Peer.on('requestDenied', handleReject);
     return () => {
       Peer.off('newRoomCreated', joinNewRoom);
       Peer.off('roomJoined', joinRoom);
+      Peer.off('approvalPending', handleWait);
+      Peer.off('requestDenied', handleReject);
     };
   }, [Peer]);
 
@@ -123,10 +141,15 @@ const MainScreen = () => {
           <RoomForm>
             <Name>Username:</Name>
             <Field ref={CreateUserRef} />
-            <Name>Room Purpose:</Name>
+            <Name>Room Name:</Name>
             <Field ref={description} />
             {/* <Name>Number of Participants:</Name>
             <Field type='number' /> */}
+            <Authorization>
+              <Field ref={authRef} type='checkbox' />
+              <Name>Require Authorization</Name>
+            </Authorization>
+
             <CreateButton onClick={handleRoomCreate}>Create</CreateButton>
           </RoomForm>
         )}
@@ -136,6 +159,11 @@ const MainScreen = () => {
             <Field ref={joinUserRef} />
             <Name>Room Code:</Name>
             <Field ref={joinCodeRef} />
+            {wait && (
+              <Message>
+                Your request to join {wait.name} {wait.status}
+              </Message>
+            )}
             <EnterButton onClick={handleJoinRoom}>Join ⇨</EnterButton>
           </RoomForm>
         )}
@@ -231,6 +259,10 @@ const EnterButton = styled(JoinButton)`
   font-size: 12pt;
 `;
 
+const Message = styled.div`
+  margin-top: 8px;
+  color: #114b8e;
+`;
 const RoomForm = styled.div`
   border: 1px solid rgba(0, 0, 0, 0.2);
   width: 350px;
@@ -269,5 +301,14 @@ const Field = styled.input`
 
   &::-webkit-inner-spin-button {
     display: none;
+  }
+`;
+
+const Authorization = styled.div`
+  margin-top: 16px;
+
+  ${Field} {
+    width: auto;
+    margin-right: 8px;
   }
 `;
