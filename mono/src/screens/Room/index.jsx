@@ -39,6 +39,7 @@ const Splash = () => {
     // })();
   }, []);
 
+
   // <----------- Functions----------->
 
   const handleCall = useCallback(
