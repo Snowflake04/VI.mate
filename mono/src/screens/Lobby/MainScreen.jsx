@@ -2,14 +2,15 @@ import styled, { keyframes } from 'styled-components';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPeer, useStream } from '../../context/StreamProvider';
-
+import phone from '../../images/phone.png';
+import laptop from '../../images/laptop.png';
 const MainScreen = () => {
   // <-------------------DECLERATIONS--------------->
   const Peer = getPeer();
   console.log(Peer);
   const [room, setRoom] = useState(false);
   const [form, setForm] = useState(false);
-  const [wait, setWait] = useState(false);
+  const [info, setInfo] = useState(false);
   const navigate = useNavigate();
   const joinUserRef = useRef();
   const joinCodeRef = useRef();
@@ -99,11 +100,19 @@ const MainScreen = () => {
   };
 
   const handleWait = (room) => {
-    setWait({ name: room, status: 'is Pending...' });
+    setInfo({ name: room, status: 'is Pending...' });
   };
 
   const handleReject = (room) => {
-    setWait({ name: room, status: 'is Declined.' });
+    setInfo({ name: room, status: 'is Declined.' });
+  };
+
+  const handleNoRoom = (room) => {
+    setInfo({
+      name: 'room',
+      status:
+        'is Rejected. Make sure the room code is correct or the room is not closed.',
+    });
   };
 
   // <-----------------------EFFECTS------------------->
@@ -113,11 +122,13 @@ const MainScreen = () => {
     Peer.on('roomJoined', joinRoom);
     Peer.on('approvalPending', handleWait);
     Peer.on('requestDenied', handleReject);
+    Peer.on('roomNotFound', handleNoRoom);
     return () => {
       Peer.off('newRoomCreated', joinNewRoom);
       Peer.off('roomJoined', joinRoom);
       Peer.off('approvalPending', handleWait);
       Peer.off('requestDenied', handleReject);
+      Peer.on('roomNotFound', handleNoRoom);
     };
   }, [Peer]);
 
@@ -159,14 +170,22 @@ const MainScreen = () => {
             <Field ref={joinUserRef} />
             <Name>Room Code:</Name>
             <Field ref={joinCodeRef} />
-            {wait && (
+            {info && (
               <Message>
-                Your request to join {wait.name} {wait.status}
+                Your request to join {info.name} {info.status}
               </Message>
             )}
             <EnterButton onClick={handleJoinRoom}>Join ⇨</EnterButton>
           </RoomForm>
         )}
+        <Images>
+          <Phone>
+            <img src={phone} />
+          </Phone>
+          <Laptop>
+            <img src={laptop} />
+          </Laptop>
+        </Images>
       </RightContainer>
     </Container>
   );
@@ -189,6 +208,29 @@ const Container = styled.div`
   grid-template-columns: 1fr 1fr;
   height: 100%;
   width: 100%;
+  overflow:hidden;
+`;
+
+const PhoneAnimation = keyframes`
+  0%{
+    transform:translate(200px ,0);
+    opacity:0;
+  }
+  30%{
+    opacity:0;
+  }
+  100%{
+    transform:translate(0,0)
+  }
+`;
+const LaptopAnimation = keyframes`
+  0%{
+    transform:translate(300px, 0);
+    opacity:0;
+  }
+  100%{
+    transform:translate(0,0)
+  }
 `;
 
 const LeftContainer = styled.div`
@@ -202,8 +244,10 @@ const LeftContainer = styled.div`
 `;
 
 const RightContainer = styled.div`
-  display: grid;
-  place-items: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
 `;
 
 const Heading = styled.div`
@@ -264,19 +308,22 @@ const Message = styled.div`
   color: #114b8e;
 `;
 const RoomForm = styled.div`
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  position: absolute;
+  left: 0;
+  border: 1px solid rgba(250, 245, 245, 0.2);
   width: 350px;
-  display: flex;
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex-direction: column;
   padding: 20px;
   border-radius: 20px;
-  backdrop-filter: blur(20px);
-  box-shadow: 2px 2px 50px #7e7e7e58;
+  background-color: rgba(217, 215, 215, 0.556);
+  backdrop-filter: blur(3px);
+  box-shadow: 20px 2px 50px #08080895;
   animation-name: ${SwipeRight};
   animation-duration: 1s;
+  z-index: 20;
 
   ${CreateButton} {
     align-self: flex-end;
@@ -310,5 +357,38 @@ const Authorization = styled.div`
   ${Field} {
     width: auto;
     margin-right: 8px;
+  }
+`;
+
+const Images = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+  filter: drop-shadow(0 15px 5px rgba(0, 0, 0, 0.5));
+  margin-right: 50px;
+`;
+
+const Phone = styled.div`
+  height: 240px;
+  position: absolute;
+  left: -3.5rem;
+  animation: ${PhoneAnimation} 2s;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+`;
+const Laptop = styled.div`
+  height: 280px;
+  z-index: 5;
+  filter: drop-shadow(-5px 0 5px rgba(0, 0, 0, 0.5));
+  animation: ${LaptopAnimation} 0.8s;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
   }
 `;

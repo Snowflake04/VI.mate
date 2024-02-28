@@ -11,7 +11,7 @@ const Splash = () => {
   const { setUserMap, setLocalStream } = useStream();
   const navigate = useNavigate();
   // <--------------Events---------->
-  console.log('room re-render', Peer.roomId );
+  console.log('room re-render', Peer.roomId);
   useEffect(() => {
     Peer.on('incommingCall', handleCall);
     Peer.on('RTCOffer', handleOffer);
@@ -29,16 +29,14 @@ const Splash = () => {
 
   // <----------Effects------------>
 
-
   useEffect(() => {
-  if (Peer.roomId === '') navigate(`/`, { replace: true });
-    
+    if (Peer.roomId === '') navigate(`/`, { replace: true });
+
     // (async () => {
     //   await Peer.setLocalStream();
     //   setLocalStream(Peer.localStream);
     // })();
   }, []);
-
 
   // <----------- Functions----------->
 
@@ -96,9 +94,17 @@ export default Splash;
 
 const MainContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 4fr 1.4fr;
+  grid-template-columns: 0.8fr 5fr 2fr;
   height: 100dvh;
   max-height: 100dvh;
-  background-color: #e0dfdf;
+  position: relative;
   padding: 12px;
+  &::before {
+    content: '';
+    position: absolute;
+    background-image: url('.../../../src/images/skulls.png');
+    inset: 0;
+    opacity: 0.2;
+    filter: invert();
+  }
 `;

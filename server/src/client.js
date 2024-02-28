@@ -11,7 +11,6 @@ class Client extends Server {
     });
 
     this.rooms = new Map();
-    this.requests = new Map()
   }
   registerSocketEvents(socket) {
     const path = './src/events';
