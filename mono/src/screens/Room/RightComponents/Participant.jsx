@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Profile from '../../../images/profile';
 
-const Participant = ({ id, username }) => {
+const Participant = ({username }) => {
   let rgx = new RegExp(/(\p{L}{1})\p{L}+/, 'gu');
 
   let initials = [...username.matchAll(rgx)] || [];

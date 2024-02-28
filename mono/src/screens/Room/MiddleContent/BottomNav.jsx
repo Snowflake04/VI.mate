@@ -168,9 +168,10 @@ const Container = styled.div`
   background: white;
   border-radius: 15px;
   margin: 10px;
-  margin-bottom: 0;
+  margin-bottom: 1px;
   padding: 5px 20px;
   min-height: 30px;
+  box-shadow:0 0 5px rgba(0,0,0,0.4);
 `;
 const RoomDetails = styled.div``;
 const Name = styled.h4``;
@@ -182,9 +183,7 @@ const Code = styled.div`
     height: 14px;
     fill: gray;
     margin-left: 16px;
-
     margin-top: 2px;
-
     cursor: pointer;
     &:active {
       transition: 0.2s;

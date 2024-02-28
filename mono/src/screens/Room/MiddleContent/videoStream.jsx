@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 const VideoStream = ({ stream, muted }) => {
   const videoRef = useRef();
-  console.log('re render');
   useEffect(() => {
     if (stream instanceof MediaStream) {
       videoRef.current.srcObject = stream;

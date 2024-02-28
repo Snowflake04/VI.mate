@@ -12,12 +12,12 @@ const MiddleContent = memo(() => {
   const [expandedLayout, setExpandedLayout] = useState(false);
   const [showRequest, setShowRequest] = useState(null);
   const socket = useRef(null);
-  const Peer = getPeer();
+  const [Peer] = useState(getPeer());
 
   useEffect(() => {
     Peer.on('userRequest', handleJoinRequest);
     return () => Peer.off('userRequest', handleJoinRequest);
-  });
+  }, [Peer]);
 
   const handleJoinRequest = useCallback(async (user) => {
     console.log(queue);
@@ -59,7 +59,7 @@ export default MiddleContent;
 
 const Container = styled.div`
   display: grid;
-  grid-template: 8.5fr 1.2fr /1fr;
+  grid-template: 8.5fr 1.5fr / auto;
   border-radius: 15px;
   margin: 0 5px;
   overflow: hidden;

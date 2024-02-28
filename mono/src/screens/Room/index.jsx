@@ -2,16 +2,15 @@ import styled from 'styled-components';
 import LeftNav from './LeftNav/LeftNav';
 import MiddleContent from './MiddleContent';
 import RightComponent from './RightComponents';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useStream, getPeer } from '../../context/StreamProvider';
 import { useNavigate } from 'react-router-dom';
 
 const Splash = () => {
-  const Peer = getPeer();
+  const [Peer] = useState(getPeer());
   const { setUserMap, setLocalStream } = useStream();
   const navigate = useNavigate();
   // <--------------Events---------->
-  console.log('room re-render', Peer.roomId);
   useEffect(() => {
     Peer.on('incommingCall', handleCall);
     Peer.on('RTCOffer', handleOffer);
@@ -30,13 +29,20 @@ const Splash = () => {
   // <----------Effects------------>
 
   useEffect(() => {
-    if (Peer.roomId === '') navigate(`/`, { replace: true });
+    if (Peer.roomId === '') return navigate(`/`, { replace: true });
 
-    // (async () => {
-    //   await Peer.setLocalStream();
-    //   setLocalStream(Peer.localStream);
-    // })();
-  }, []);
+    (async () => {
+      console.log("Setting Peer local Stream")
+      await Peer.setLocalStream();
+      setLocalStream(Peer.localStream);
+      if (Object.keys(Peer.roomDetails.participants).length > 1) {
+        Peer.emit('createCall', {
+          roomId: Peer.roomId,
+          from: Peer.id,
+        });
+      }
+    })();
+  }, [Peer]);
 
   // <----------- Functions----------->
 

@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 import VideoStream from './videoStream';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = ({ layout }) => {
-  const Peer = getPeer();
-
+  const [Peer] = useState(getPeer());
   const { remoteStream, setRemoteStream, localStream } = useStream();
 
   // <--------Effects--------->
@@ -14,13 +13,13 @@ const VideoScreen = ({ layout }) => {
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
   }, [Peer]);
 
-
-
   // <----------Functions--------->
 
   const handleStreamUpdate = useCallback(() => {
     setRemoteStream({ ...Peer.remoteStream });
   }, [Peer]);
+
+  const remoteClickHandler = () => {};
 
   return (
     <Container layout={layout}>
@@ -37,7 +36,6 @@ const VideoScreen = ({ layout }) => {
         <>
           <LocalStream>
             <VideoStream muted stream={Peer.localStream} />
-
           </LocalStream>
           <RemoteStream>
             {remoteStream &&
@@ -59,13 +57,13 @@ const Container = styled.div`
   display: ${(props) => (props.layout ? 'grid' : 'flex')};
   flex-direction: column;
   grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
   border-radius: 15px;
-  margin: 5px 10px;
+  margin: 0 10px;
   margin-top: 0;
   position: relative;
   justify-content: space-between;
   align-content: space-between;
+  border: 2px solid red;
 `;
 
 const LocalStream = styled.div`

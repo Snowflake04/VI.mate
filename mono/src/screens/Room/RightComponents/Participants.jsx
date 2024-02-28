@@ -4,7 +4,7 @@ import { useStream } from '../../../context/StreamProvider';
 
 const Participants = () => {
   const { userMap } = useStream();
-  console.log(userMap);
+
   return (
     <Container>
       <Header>
@@ -13,7 +13,7 @@ const Participants = () => {
       </Header>
       <ParticipantsHolder>
         {Object.entries(userMap).map(([key, value]) => (
-          <Participant id={key} username={value} />
+          <Participant key={key} username={value} />
         ))}
       </ParticipantsHolder>
     </Container>

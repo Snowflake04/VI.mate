@@ -86,10 +86,10 @@ const MainScreen = () => {
     setUserMap(room.participants);
     setMessages(room.messages);
     navigate(`/room/${room.roomCode}`, { replace: true });
-    Peer.emit('createCall', {
-      roomId: Peer.roomId,
-      from: Peer.id,
-    });
+    // Peer.emit('createCall', {
+    //   roomId: Peer.roomId,
+    //   from: Peer.id,
+    // });
   };
 
   const joinNewRoom = async (room) => {
@@ -208,7 +208,7 @@ const Container = styled.div`
   grid-template-columns: 1fr 1fr;
   height: 100%;
   width: 100%;
-  overflow:hidden;
+  overflow: hidden;
 `;
 
 const PhoneAnimation = keyframes`
@@ -216,7 +216,7 @@ const PhoneAnimation = keyframes`
     transform:translate(200px ,0);
     opacity:0;
   }
-  30%{
+  15%{
     opacity:0;
   }
   100%{
