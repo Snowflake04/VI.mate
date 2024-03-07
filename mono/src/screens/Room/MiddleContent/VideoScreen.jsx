@@ -5,6 +5,7 @@ import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = ({ layout }) => {
   const [Peer] = useState(getPeer());
+  const lay = layout
   const { remoteStream, setRemoteStream, localStream } = useStream();
 
   // <--------Effects--------->
@@ -19,10 +20,10 @@ const VideoScreen = ({ layout }) => {
     setRemoteStream({ ...Peer.remoteStream });
   }, [Peer]);
 
-  const remoteClickHandler = () => {};
+  const remoteClickHandler = () => {};// TODO: 
 
   return (
-    <Container layout={layout}>
+    <Container expanded={lay}>
       {layout ? (
         <>
           <VideoStream muted stream={Peer.localStream} />
@@ -54,7 +55,7 @@ const VideoScreen = ({ layout }) => {
 export default VideoScreen;
 
 const Container = styled.div`
-  display: ${(props) => (props.layout ? 'grid' : 'flex')};
+  display: ${(props) => (props.expanded ? 'grid' : 'flex')};
   flex-direction: column;
   grid-template: auto/repeat(auto-fill, minmax(200px, 1fr));
   border-radius: 15px;
