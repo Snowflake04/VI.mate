@@ -6,8 +6,9 @@ import phone from '../../images/phone.png';
 import laptop from '../../images/laptop.png';
 const MainScreen = () => {
   // <-------------------DECLERATIONS--------------->
+
   const Peer = getPeer();
-  console.log(Peer);
+
   const [room, setRoom] = useState(false);
   const [form, setForm] = useState(false);
   const [info, setInfo] = useState(false);
@@ -20,7 +21,7 @@ const MainScreen = () => {
 
   const { setMessages, setUserMap } = useStream();
 
-  // <----------------------FUNCTIONS-------------------->
+  // <---------------------- FUNCTIONS -------------------->
 
   const handleJoin = useCallback(() => {
     setForm(false);
@@ -34,12 +35,14 @@ const MainScreen = () => {
 
   const handleRoomCreate = useCallback(() => {
     let err = {};
-    if (CreateUserRef.current.value === '') {
+    if (CreateUserRef.current.value.trim() === '') {
+      CreateUserRef.current.value = '';
       CreateUserRef.current.placeholder = 'Username is required';
       err['user'] = true;
     }
 
-    if (description.current.value === '') {
+    if (description.current.value.trim() === '') {
+      description.current.value = '';
       description.current.placeholder = 'Add a description!';
       err['des'] = true;
     }
@@ -47,8 +50,8 @@ const MainScreen = () => {
     if (Object.values(err).every((val) => val === null)) {
       Peer.emit(
         'createRoom',
-        CreateUserRef.current.value,
-        description.current.value,
+        CreateUserRef.current.value.trim(),
+        description.current.value.trim(),
         authRef.current.checked
       );
     }
@@ -58,11 +61,13 @@ const MainScreen = () => {
     const err = {};
     const regEx = /^[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}$/;
 
-    if (joinUserRef.current.value === '') {
+    if (joinUserRef.current.value.trim() === '') {
+      joinUserRef.current.value = '';
       joinUserRef.current.placeholder = 'Username is required!';
       err['user'] = true;
     }
-    if (joinCodeRef.current.value === '') {
+    if (joinCodeRef.current.value.trim() === '') {
+      joinCodeRef.current.value = '';
       joinCodeRef.current.placeholder = 'Please enter Room Code';
       err['code'] = true;
     } else if (!regEx.test(joinCodeRef.current.value)) {
@@ -74,8 +79,8 @@ const MainScreen = () => {
     if (Object.values(err).every((val) => val === null)) {
       Peer.emit(
         'joinRoom',
-        joinUserRef.current.value,
-        joinCodeRef.current.value
+        joinUserRef.current.value.trim(),
+        joinCodeRef.current.value.trim()
       );
     }
   });
@@ -85,17 +90,6 @@ const MainScreen = () => {
     Peer.roomDetails = room;
     setUserMap(room.participants);
     setMessages(room.messages);
-    navigate(`/room/${room.roomCode}`, { replace: true });
-    // Peer.emit('createCall', {
-    //   roomId: Peer.roomId,
-    //   from: Peer.id,
-    // });
-  };
-
-  const joinNewRoom = async (room) => {
-    setUserMap(room.participants);
-    Peer.roomId = room.roomCode;
-    Peer.roomDetails = room;
     navigate(`/room/${room.roomCode}`, { replace: true });
   };
 
@@ -115,16 +109,16 @@ const MainScreen = () => {
     });
   };
 
-  // <-----------------------EFFECTS------------------->
+  // <----------------------- EFFECTS ------------------->
 
   useEffect(() => {
-    Peer.on('newRoomCreated', joinNewRoom);
+    Peer.on('newRoomCreated', joinRoom);
     Peer.on('roomJoined', joinRoom);
     Peer.on('approvalPending', handleWait);
     Peer.on('requestDenied', handleReject);
     Peer.on('roomNotFound', handleNoRoom);
     return () => {
-      Peer.off('newRoomCreated', joinNewRoom);
+      Peer.off('newRoomCreated', joinRoom);
       Peer.off('roomJoined', joinRoom);
       Peer.off('approvalPending', handleWait);
       Peer.off('requestDenied', handleReject);
@@ -154,13 +148,16 @@ const MainScreen = () => {
             <Field ref={CreateUserRef} />
             <Name>Room Name:</Name>
             <Field ref={description} />
+
             {/* <Name>Number of Participants:</Name>
-            <Field type='number' /> */}
+            <Field type='number' /> 
+            //TODO: Feature for future release
+            
+            */}
             <Authorization>
               <Field ref={authRef} type='checkbox' />
               <Name>Require Authorization</Name>
             </Authorization>
-
             <CreateButton onClick={handleRoomCreate}>Create</CreateButton>
           </RoomForm>
         )}
@@ -180,10 +177,10 @@ const MainScreen = () => {
         )}
         <Images>
           <Phone>
-            <img src={phone} />
+            <img draggable='false' src={phone} />
           </Phone>
           <Laptop>
-            <img src={laptop} />
+            <img draggable='false' src={laptop} />
           </Laptop>
         </Images>
       </RightContainer>
@@ -262,6 +259,7 @@ const FormHolder = styled.div`
   display: flex;
   gap: 16px;
 `;
+
 const CreateButton = styled.button`
   border: none;
   position: relative;
@@ -380,6 +378,7 @@ const Phone = styled.div`
     object-fit: contain;
   }
 `;
+
 const Laptop = styled.div`
   height: 280px;
   z-index: 5;

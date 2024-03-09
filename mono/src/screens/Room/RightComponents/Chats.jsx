@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import ChatBubble from './ChatBubble';
 import { useCallback, useEffect, useRef } from 'react';
-import { useStream, getPeer } from '../../../context/StreamProvider';
+import { useStream, getPeer } from '/src/context/StreamProvider';
 
 const Chats = () => {
   const Peer = getPeer();
@@ -29,7 +29,7 @@ const Chats = () => {
   });
 
   const handleSendButton = () => {
-    const message = inputRef.current.value;
+    const message = inputRef.current.value.trim();
     if (message) {
       Peer.emit('message', message, Peer.roomId);
       setMessages((prevMessages) => [
@@ -37,7 +37,6 @@ const Chats = () => {
         { content: message, self: true },
       ]);
       inputRef.current.value = '';
-      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
   };
 
@@ -77,7 +76,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(#ffffff, #e5eefc);
+  background: linear-gradient(-0.75turn, #ffffff, #e5eefc);
 `;
 
 const Header = styled.div`
@@ -107,8 +106,10 @@ const ChatArea = styled.div`
   padding: 0 10vpx;
   overflow-y: scroll;
   position: relative;
+  padding-bottom: 60px;
   &::-webkit-scrollbar {
     display: none;
+    scroll-behavior: smooth;
   }
 `;
 
@@ -122,9 +123,10 @@ const TextArea = styled.div`
   width: 100%;
   background-color: rgba(255, 255, 255, 0.252);
   backdrop-filter: blur(3px);
-  box-shadow: 0 0 5px rgba(0,0,0, 0.2);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   z-index: 5;
 `;
+
 const Input = styled.input`
   outline: none;
   border: none;

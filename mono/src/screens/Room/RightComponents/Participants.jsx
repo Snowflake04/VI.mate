@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Participant from './Participant';
-import { useStream } from '../../../context/StreamProvider';
+import { useStream } from '/src/context/StreamProvider';
 
 const Participants = () => {
   const { userMap } = useStream();
@@ -12,8 +12,8 @@ const Participants = () => {
         <Counter>{Object.keys(userMap).length}</Counter>
       </Header>
       <ParticipantsHolder>
-        {Object.entries(userMap).map(([key, value]) => (
-          <Participant key={key} username={value} />
+        {Object.entries(userMap).map(([key, value]) =>(
+          <Participant key={key}  username={value} />
         ))}
       </ParticipantsHolder>
     </Container>
