@@ -3,6 +3,6 @@
   "extends": [
     "config:recommended"
   ],
-  "branches": ["chores"],
+  "baseBranches": ["chores"],
   "rebase": true
 }
