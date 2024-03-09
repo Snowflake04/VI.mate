@@ -4,5 +4,4 @@
     "config:recommended"
   ],
   "baseBranches": ["chores"],
-  "rebase": true
 }
