@@ -5,8 +5,10 @@ updates:
     directory: "/mono" 
     schedule:
       interval: "daily"
+      target-branch: "main"
       
   - package-ecosystem: "npm"
     directory: "/client" 
     schedule:
       interval: "daily"
+      target-branch: "main"
