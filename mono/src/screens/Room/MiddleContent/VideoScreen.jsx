@@ -64,7 +64,6 @@ const Container = styled.div`
   position: relative;
   justify-content: space-between;
   align-content: space-between;
-  border: 2px solid red;
 `;
 
 const LocalStream = styled.div`

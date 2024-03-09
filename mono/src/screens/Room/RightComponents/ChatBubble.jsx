@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useStream } from '../../../context/StreamProvider';
+import UserAvatar from '../../../images/userAvatar.svg'
 
 const UserBubble = ({ message }) => {
   const { userMap } = useStream();
@@ -11,7 +12,9 @@ const UserBubble = ({ message }) => {
 
   return (
     <Container user={message.self ? true : null}>
-      <Avatar></Avatar>
+      <Avatar>
+        <img src={UserAvatar} alt="" />
+      </Avatar>
       <Message user={message.self ? true : null}>
         {message.content}
         <Placeholder user={message.self ? true : null}>
@@ -34,8 +37,16 @@ const Container = styled.div`
 const Avatar = styled.div`
   height: 40px;
   aspect-ratio: 1;
-  border: 2px solid;
+  padding:5px;
+  padding-bottom:0;
+  background-color:white;
   border-radius: 100dvh;
+  overflow:hidden;
+  filter:drop-shadow(0 5px 2px rgba(0, 0, 0, 0.05));
+  img{
+    width:100%;
+    height:100%;
+  }
 `;
 
 const Message = styled.div`
@@ -58,11 +69,11 @@ const Message = styled.div`
   filter: drop-shadow(3px 3px 2px #bbbbbba9);
 `;
 const Placeholder = styled.div`
-  height: 12px;
+  height: 14px;
   filter: none;
-  /* overflow: hidden; */
-  width: 100%;
+  width: auto;
   display: flex;
+  overflow:hidden;
   justify-content: ${(props) => (props.user ? 'flex-end' : 'flex-start')};
   padding-right: 12px;
   position: absolute;
