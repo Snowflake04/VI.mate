@@ -2,13 +2,15 @@
 version: 2
 updates:
   - package-ecosystem: "npm" 
-    directory: "/mono" 
+    directory: "/mono"
+    target-branch: "master"
     schedule:
       interval: "daily"
-      target-branch: "main"
+      
       
   - package-ecosystem: "npm"
     directory: "/client" 
+    target-branch: "master"
     schedule:
       interval: "daily"
-      target-branch: "main"
+      
