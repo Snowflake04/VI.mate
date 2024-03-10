@@ -13,7 +13,7 @@
   <p align="center">
     A Peer-to-Peer video conference App
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="https://vimate.vercel.app">View Demo</a>
     ·
     <a href="https://github.com/snowflake04/VI.mate/issues">Report Bug</a>
     ·
@@ -63,7 +63,7 @@ Here's why:
 * Simple UI: unneccessary UI elements are removed in order to give user a simple and professional feel.
 * It is open- source :smile:
 
-Even though the project is open source, It is not recommended to create own instance of the project. If You want to check out the project you can click [here]() to see a live demo of the project.
+Even though the project is open source, It is not recommended to create own instance of the project. If You want to check out the project you can click [here](https://vimate.vercel.app) to see a live demo of the project.
 
 Note: Due to limitations in hosting service, please allow upto 40 seconds for the UI to change after creating the room initally. The server spins down due to inactivity for a while.
 
