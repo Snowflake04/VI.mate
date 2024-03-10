@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import styled from 'styled-components';
 
 const VideoStream = ({ stream, muted }) => {
   const videoRef = useRef();
   useEffect(() => {
+    console.log('video re rendered');
     if (stream instanceof MediaStream) {
       videoRef.current.srcObject = stream;
     }
@@ -16,7 +17,7 @@ const VideoStream = ({ stream, muted }) => {
   );
 };
 
-export default VideoStream;
+export default memo(VideoStream);
 
 const Player = styled.video`
   padding: 0;

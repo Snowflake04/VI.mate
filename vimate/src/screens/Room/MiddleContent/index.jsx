@@ -6,7 +6,6 @@ import { getPeer } from '../../../context/StreamProvider';
 import { AsyncQueue } from '@snowflake04/async-queue';
 
 const MiddleContent = memo(() => {
-  console.log('video re rendered');
   const [queue] = useState(() => new AsyncQueue());
 
   const [expandedLayout, setExpandedLayout] = useState(false);

@@ -52,20 +52,22 @@ const VideoScreen = ({ layout }) => {
   return (
     <Container expanded={lay}>
       {layout ? (
-        <>
-          <VideoStream muted stream={localStream} />
-
-          {remoteStream &&
-            Object.values(remoteStream).map((stream) => {
-              <VideoStream stream={stream} />;
+        <ExpandedLayout>
+          {localVideo &&
+            Object.values(localVideo).map((stream) => {
+              return stream;
             })}
-        </>
+
+          {remoteVideos &&
+            Object.values(remoteVideos).map((stream) => {
+              return stream;
+            })}
+        </ExpandedLayout>
       ) : (
         <>
           <LocalStream>
             {localVideo &&
               Object.values(localVideo).map((stream) => {
-                console.log(stream)
                 return stream;
               })}
           </LocalStream>
@@ -95,6 +97,11 @@ const Container = styled.div`
   justify-content: space-between;
   align-content: space-between;
 `;
+
+const ExpandedLayout = styled.div`
+display:flex;
+gap:16px;
+`
 
 const LocalStream = styled.div`
   aspect-ratio: 16/9;
