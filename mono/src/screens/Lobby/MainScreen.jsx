@@ -131,10 +131,14 @@ const MainScreen = () => {
       <LeftContainer>
         <Heading>Meet without a Hitch</Heading>
         <Content>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus
-          placeat minus quod aut. Itaque exercitationem officiis ad ab debitis,
-          distinctio molestias quos provident harum doloribus dolorem libero!
-          Recusandae, facilis rerum.
+          Discover the future of video conferencing with vi.mate. Designed to
+          offer a seamless and secure video communication experience, vi.mate
+          provide real-time, peer-to-peer video and audio communication ensuring
+          high-quality video calls with minimal latency. With features like
+          screen sharing, text chat vi.mate is not just a tool for communication
+          but a comprehensive platform for effective collaboration. Experience
+          the convenience and efficiency of video meetings without the need for
+          cumbersome plugins or third-party software. .
         </Content>
         <FormHolder>
           <CreateButton onClick={handleForm}>Start a New Meeting</CreateButton>
@@ -252,6 +256,8 @@ const Heading = styled.div`
 `;
 const Content = styled.div`
   margin-top: 16px;
+  line-height:14pt;
+  text-align:justify;
 `;
 
 const FormHolder = styled.div`
