@@ -1,12 +1,39 @@
 import styled from 'styled-components';
 import VideoStream from './videoStream';
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useMemo } from 'react';
 import { useStream, getPeer } from '../../../context/StreamProvider';
 
 const VideoScreen = ({ layout }) => {
-  const [Peer] = useState(getPeer());
-  const lay = layout
+  const Peer = useMemo(() => getPeer());
+  const lay = layout;
   const { remoteStream, setRemoteStream, localStream } = useStream();
+  const [localVideo, setLocalVideo] = useState(null);
+  const [remoteVideos, setRemoteVideos] = useState({});
+
+  useMemo(() => {
+    let localVideoMap = {};
+    if (localStream) {
+      console.log('updating local Video Map');
+      //minimal Performance Impact. Max object Size = 25
+      for (const [id, stream] of Object.entries(localStream)) {
+        localVideoMap[id] = <VideoStream muted stream={stream} />;
+      }
+      setLocalVideo({ ...localVideoMap });
+    }
+  }, [localStream]);
+
+  useMemo(() => {
+    let remoteVideoMap = {};
+    if (remoteStream) {
+      console.log('updating remote Video Map');
+      for (const [id, stream] of Object.entries(remoteStream)) {
+        remoteVideoMap[id] = <VideoStream stream={stream} />;
+      }
+    } else {
+      remoteVideoMap = {}; //Reset the Map
+    }
+    setRemoteVideos({ ...remoteVideoMap });
+  }, [remoteStream]);
 
   // <--------Effects--------->
   useEffect(() => {
@@ -20,29 +47,33 @@ const VideoScreen = ({ layout }) => {
     setRemoteStream({ ...Peer.remoteStream });
   }, [Peer]);
 
-  const remoteClickHandler = () => {};// TODO: 
+  const remoteClickHandler = () => {}; // TODO:
 
   return (
     <Container expanded={lay}>
       {layout ? (
         <>
-          <VideoStream muted stream={Peer.localStream} />
+          <VideoStream muted stream={localStream} />
 
           {remoteStream &&
-            Object.values(remoteStream).map((stream) => (
-              <VideoStream stream={stream} />
-            ))}
+            Object.values(remoteStream).map((stream) => {
+              <VideoStream stream={stream} />;
+            })}
         </>
       ) : (
         <>
           <LocalStream>
-            <VideoStream muted stream={Peer.localStream} />
+            {localVideo &&
+              Object.values(localVideo).map((stream) => {
+                console.log(stream)
+                return stream;
+              })}
           </LocalStream>
           <RemoteStream>
-            {remoteStream &&
-              Object.values(remoteStream).map((stream) => (
-                <RemoteStreamContainer key={stream.id}>
-                  <VideoStream stream={stream} />
+            {remoteVideos &&
+              Object.values(remoteVideos).map((stream, index) => (
+                <RemoteStreamContainer key={index}>
+                  {stream}
                 </RemoteStreamContainer>
               ))}
           </RemoteStream>
@@ -51,7 +82,6 @@ const VideoScreen = ({ layout }) => {
     </Container>
   );
 };
-
 export default VideoScreen;
 
 const Container = styled.div`

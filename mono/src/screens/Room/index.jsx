@@ -33,9 +33,9 @@ const Splash = () => {
     if (Peer.roomId === '') return navigate(`/`, { replace: true });
 
     (async () => {
-      console.log("Setting Peer local Stream")
+      console.log('Setting Peer local Stream');
       await Peer.setLocalStream();
-      setLocalStream(Peer.localStream);
+      setLocalStream({ [Peer.id]: Peer.localStream });
       if (Object.keys(Peer.roomDetails.participants).length > 1) {
         Peer.emit('createCall', {
           roomId: Peer.roomId,
