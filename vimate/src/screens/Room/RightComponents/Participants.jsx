@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import Participant from './Participant';
-import { useStream } from '../../../context/StreamProvider';
+import { useStream } from '/src/context/StreamProvider';
 
 const Participants = () => {
   const { userMap } = useStream();
-  console.log(userMap);
+
   return (
     <Container>
       <Header>
@@ -12,8 +12,8 @@ const Participants = () => {
         <Counter>{Object.keys(userMap).length}</Counter>
       </Header>
       <ParticipantsHolder>
-        {Object.entries(userMap).map(([key, value]) => (
-          <Participant id={key} username={value} />
+        {Object.entries(userMap).map(([key, value]) =>(
+          <Participant key={key}  username={value} />
         ))}
       </ParticipantsHolder>
     </Container>
@@ -25,7 +25,7 @@ export default Participants;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  background: white;
+  background: linear-gradient( #eafafb,#ffffff);
   border-radius: 10px;
   margin-bottom: 5px;
   overflow: hidden;
@@ -39,15 +39,7 @@ const Header = styled.div`
   max-width: 100%;
   font-size: 1.4rem;
   position: relative;
-
-  &::after {
-    content: '';
-    background: #c0bebe;
-    height: 2px;
-    width: 80%;
-    position: absolute;
-    bottom: 0;
-  }
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1)
 `;
 
 const Counter = styled.div`

@@ -3,30 +3,38 @@ import VideoScreen from './VideoScreen';
 import BottomNav from './BottomNav';
 import { memo, useCallback, useEffect, useState, useRef } from 'react';
 import { getPeer } from '../../../context/StreamProvider';
+import { AsyncQueue } from '@snowflake04/async-queue';
 
 const MiddleContent = memo(() => {
-  console.log('video rerendered');
+  console.log('video re rendered');
+  const [queue] = useState(() => new AsyncQueue());
 
   const [expandedLayout, setExpandedLayout] = useState(false);
   const [showRequest, setShowRequest] = useState(null);
   const socket = useRef(null);
-  const Peer = getPeer();
+  const [Peer] = useState(getPeer());
 
   useEffect(() => {
     Peer.on('userRequest', handleJoinRequest);
     return () => Peer.off('userRequest', handleJoinRequest);
-  });
+  }, [Peer]);
 
   const handleJoinRequest = useCallback(async (user) => {
+    console.log(queue);
+    await queue.wait();
     setShowRequest(user.name);
     socket.current = user;
   });
   const handleApproval = useCallback(() => {
     Peer.emit('requestApproval', socket.current, Peer.roomId);
+    queue.shift();
+    if (!queue.promises[0]) setShowRequest('');
   });
 
   const handleReject = useCallback(() => {
     Peer.emit('requestDecline', socket.current, Peer.roomId);
+    queue.shift();
+    if (!queue.promises[0]) setShowRequest('');
   });
 
   return (
@@ -41,7 +49,6 @@ const MiddleContent = memo(() => {
         </Request>
       )}
       <VideoScreen layout={expandedLayout} />
-
       <BottomNav setLayout={setExpandedLayout} />
     </Container>
   );
@@ -51,7 +58,7 @@ export default MiddleContent;
 
 const Container = styled.div`
   display: grid;
-  grid-template: 8.5fr 1.2fr /1fr;
+  grid-template: 8.5fr 1.5fr / auto;
   border-radius: 15px;
   margin: 0 5px;
   overflow: hidden;

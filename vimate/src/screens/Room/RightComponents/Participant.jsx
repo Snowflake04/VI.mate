@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import Profile from '../../../images/profile';
+import Profile from '/src/images/profile';
 
-const Participant = ({ id, username }) => {
+const Participant = ({username }) => {
   let rgx = new RegExp(/(\p{L}{1})\p{L}+/, 'gu');
 
   let initials = [...username.matchAll(rgx)] || [];
@@ -70,10 +70,15 @@ const Controls = styled.div`
   border-radius: 50%;
   display: grid;
   place-items: center;
+  cursor:pointer;
   svg {
     height: 80%;
     width: 80%;
     object-fit: contain;
     fill: #b6b5b5;
+    &:hover{
+      transition:0.3s;
+      transform:scale(1.1);
+    }
   }
 `;

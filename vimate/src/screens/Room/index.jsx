@@ -2,16 +2,16 @@ import styled from 'styled-components';
 import LeftNav from './LeftNav/LeftNav';
 import MiddleContent from './MiddleContent';
 import RightComponent from './RightComponents';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useStream, getPeer } from '../../context/StreamProvider';
 import { useNavigate } from 'react-router-dom';
 
 const Splash = () => {
-  const Peer = getPeer();
+  const [Peer] = useState(getPeer());
   const { setUserMap, setLocalStream } = useStream();
   const navigate = useNavigate();
-  // <--------------Events---------->
-  console.log('room re-render', Peer.roomId );
+
+  // <-------------- Events ---------->
   useEffect(() => {
     Peer.on('incommingCall', handleCall);
     Peer.on('RTCOffer', handleOffer);
@@ -27,20 +27,25 @@ const Splash = () => {
     };
   }, [Peer]);
 
-  // <----------Effects------------>
-
+  // <---------- Effects ------------>
 
   useEffect(() => {
-  if (Peer.roomId === '') navigate(`/`, { replace: true });
-    
-    // (async () => {
-    //   await Peer.setLocalStream();
-    //   setLocalStream(Peer.localStream);
-    // })();
-  }, []);
+    if (Peer.roomId === '') return navigate(`/`, { replace: true });
 
+    (async () => {
+      console.log('Setting Peer local Stream');
+      await Peer.setLocalStream();
+      setLocalStream({ [Peer.id]: Peer.localStream });
+      if (Object.keys(Peer.roomDetails.participants).length > 1) {
+        Peer.emit('createCall', {
+          roomId: Peer.roomId,
+          from: Peer.id,
+        });
+      }
+    })();
+  }, [Peer]);
 
-  // <----------- Functions----------->
+  // <----------- Functions ----------->
 
   const handleCall = useCallback(
     async (offer) => {
@@ -96,9 +101,17 @@ export default Splash;
 
 const MainContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 4fr 1.4fr;
+  grid-template-columns: 1.2fr 5fr 2fr;
   height: 100dvh;
   max-height: 100dvh;
-  background-color: #e0dfdf;
+  position: relative;
   padding: 12px;
+  &::before {
+    content: '';
+    position: absolute;
+    background-image: url('/src/images/skulls.png');
+    inset: 0;
+    opacity: 0.2;
+    filter: invert();
+  }
 `;

@@ -4,7 +4,6 @@ module.exports = ({ server, socket }, user, roomCode) => {
   room.participants[user.id] = user.name;
   server.rooms.set(roomCode, room);
   userSocket.join(roomCode);
-  console.log(room);
   server
     .to(user.id)
     .emit(
