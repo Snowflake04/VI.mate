@@ -158,8 +158,8 @@ If you need to update `npm`, you can make it using `npm`! After running the foll
 - [x] Add user Avatar
 - [x] Add screenshare
 - [x] Expand user stream on click
-- [] Add private chat
-- [] Add theme switching
+- [ ] Add private chat
+- [ ] Add theme switching
 
 See the [open issues](https://github.com/snowflake04/vi.mate/issues) for a full list of proposed features (and known issues).
 >
