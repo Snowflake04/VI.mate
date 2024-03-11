@@ -41,6 +41,7 @@ const VideoScreen = ({ layout }) => {
     return () => Peer.off('remoteStreamUpdate', handleStreamUpdate);
   }, [Peer]);
 
+  
   // <----------Functions--------->
 
   const handleStreamUpdate = useCallback(() => {
@@ -99,9 +100,9 @@ const Container = styled.div`
 `;
 
 const ExpandedLayout = styled.div`
-display:flex;
-gap:16px;
-`
+  display: flex;
+  gap: 16px;
+`;
 
 const LocalStream = styled.div`
   aspect-ratio: 16/9;
