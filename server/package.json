@@ -1,16 +1,26 @@
 {
-  "name": "server",
+  "name": "vimate-signaling",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --watch index.js"
+  "private": true,
+  "description": "Signaling-only server for VI.mate. Never carries media — WebRTC is peer-to-peer.",
+  "main": "src/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11.0"
   },
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "lint": "node --check src/index.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "license": "Apache-2.0",
   "dependencies": {
-    "canvas": "^2.11.2",
-    "socket.io": "^4.6.1"
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.3"
   }
 }
