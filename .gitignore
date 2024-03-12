@@ -1,5 +1,28 @@
-# Client-side node_modules
-client/node_modules/
+node_modules/
 
-# Server-side node_modules
-server/node_modules/
+# Environment files hold deployment configuration and, on the server side, the
+# TURN shared secret. Only the .example files belong in version control.
+.env
+.env.*
+!.env.example
+
+dist/
+build/
+*.local
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Playwright
+e2e/test-results/
+e2e/playwright-report/
+certs/
